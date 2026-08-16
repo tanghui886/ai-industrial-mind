@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>现场接单</title>
+    <style id="theme-vars">
+:root {
+  /* Brand primary scale — industrial tech cyan */
+  --cm-primary-50: #ecfeff;
+  --cm-primary-100: #cffafe;
+  --cm-primary-200: #a5f3fc;
+  --cm-primary-300: #67e8f9;
+  --cm-primary-400: #22d3ee;
+  --cm-primary-500: #06b6d4;
+  --cm-primary-600: #0891b2;
+  --cm-primary-700: #0e7490;
+  --cm-primary-800: #155e75;
+  --cm-primary-900: #164e63;
+
+  /* Neutral slate scale */
+  --cm-slate-50: #f8fafc;
+  --cm-slate-100: #f1f5f9;
+  --cm-slate-200: #e2e8f0;
+  --cm-slate-300: #cbd5e1;
+  --cm-slate-400: #94a3b8;
+  --cm-slate-500: #64748b;
+  --cm-slate-600: #475569;
+  --cm-slate-700: #334155;
+  --cm-slate-800: #1e293b;
+  --cm-slate-900: #0f172a;
+
+  /* Semantic tokens */
+  --cm-background: var(--cm-slate-50);
+  --cm-foreground: var(--cm-slate-900);
+  --cm-card: #ffffff;
+  --cm-card-foreground: var(--cm-slate-900);
+  --cm-popover: #ffffff;
+  --cm-popover-foreground: var(--cm-slate-900);
+  --cm-primary: var(--cm-primary-600);
+  --cm-primary-foreground: #ffffff;
+  --cm-muted: var(--cm-slate-100);
+  --cm-muted-foreground: var(--cm-slate-500);
+  --cm-border: var(--cm-slate-200);
+  --cm-input: var(--cm-slate-200);
+  --cm-ring: var(--cm-primary-400);
+
+  /* State tokens */
+  --cm-state-success: #10b981;
+  --cm-state-success-bg: #d1fae5;
+  --cm-state-warning: #f59e0b;
+  --cm-state-warning-bg: #fef3c7;
+  --cm-state-error: #ef4444;
+  --cm-state-error-bg: #fee2e2;
+  --cm-state-info: var(--cm-primary-500);
+  --cm-state-info-bg: var(--cm-primary-50);
+
+  /* Radius */
+  --cm-radius-small: 4px;
+  --cm-radius-medium: 8px;
+  --cm-radius-large: 12px;
+  --cm-radius-full: 9999px;
+
+  /* Shadows */
+  --cm-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --cm-shadow-2: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+  --cm-shadow-3: 0 24px 60px -20px rgba(15, 23, 42, 0.22);
+
+  /* Typography */
+  --cm-font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --cm-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* Spacing scale */
+  --cm-s-1: 4px;
+  --cm-s-2: 8px;
+  --cm-s-3: 12px;
+  --cm-s-4: 16px;
+  --cm-s-5: 24px;
+  --cm-s-6: 32px;
+  --cm-s-7: 48px;
+  --cm-s-8: 64px;
+}
+
+html.dark {
+  --cm-background: #0b0f19;
+  --cm-foreground: #f1f5f9;
+  --cm-card: #111827;
+  --cm-card-foreground: #f1f5f9;
+  --cm-popover: #111827;
+  --cm-popover-foreground: #f1f5f9;
+  --cm-muted: #1e293b;
+  --cm-muted-foreground: #94a3b8;
+  --cm-border: #1e293b;
+  --cm-input: #1e293b;
+}
+
+body {
+  font-family: var(--cm-font-sans);
+  background-color: var(--cm-background);
+  color: var(--cm-foreground);
+}
+
+.cm-heading {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.cm-kpi-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cm-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--cm-background);
+    --color-foreground: var(--cm-foreground);
+    --color-card: var(--cm-card);
+    --color-card-foreground: var(--cm-card-foreground);
+    --color-popover: var(--cm-popover);
+    --color-popover-foreground: var(--cm-popover-foreground);
+    --color-primary: var(--cm-primary);
+    --color-primary-foreground: var(--cm-primary-foreground);
+    --color-muted: var(--cm-muted);
+    --color-muted-foreground: var(--cm-muted-foreground);
+    --color-border: var(--cm-border);
+    --color-input: var(--cm-input);
+    --color-ring: var(--cm-ring);
+    --radius-sm: var(--cm-radius-small);
+    --radius-md: var(--cm-radius-medium);
+    --radius-lg: var(--cm-radius-large);
+  }
+  @layer base {
+    body { background: var(--cm-background); color: var(--cm-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="critical-layout">
+      html, body { overflow-x: hidden; }
+      .cm-mobile-wrap {
+        width: 100%;
+        max-width: 430px;
+        margin-left: auto;
+        margin-right: auto;
+        min-height: 100vh;
+        position: relative;
+        background-color: var(--cm-background);
+      }
+      .cm-main-scroll {
+        padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+      }
+      .cm-bottom-nav {
+        height: 56px;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      .cm-touch-target {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--cm-background); }
+      .text-background { color: var(--cm-background); }
+      .border-background { border-color: var(--cm-background); }
+      .ring-background { --tw-ring-color: var(--cm-background); }
+      .bg-foreground { background-color: var(--cm-foreground); }
+      .text-foreground { color: var(--cm-foreground); }
+      .border-foreground { border-color: var(--cm-foreground); }
+      .ring-foreground { --tw-ring-color: var(--cm-foreground); }
+      .bg-card { background-color: var(--cm-card); }
+      .text-card { color: var(--cm-card); }
+      .border-card { border-color: var(--cm-card); }
+      .ring-card { --tw-ring-color: var(--cm-card); }
+      .bg-card-foreground { background-color: var(--cm-card-foreground); }
+      .text-card-foreground { color: var(--cm-card-foreground); }
+      .border-card-foreground { border-color: var(--cm-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--cm-card-foreground); }
+      .bg-popover { background-color: var(--cm-popover); }
+      .text-popover { color: var(--cm-popover); }
+      .border-popover { border-color: var(--cm-popover); }
+      .ring-popover { --tw-ring-color: var(--cm-popover); }
+      .bg-popover-foreground { background-color: var(--cm-popover-foreground); }
+      .text-popover-foreground { color: var(--cm-popover-foreground); }
+      .border-popover-foreground { border-color: var(--cm-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--cm-popover-foreground); }
+      .bg-primary { background-color: var(--cm-primary); }
+      .text-primary { color: var(--cm-primary); }
+      .border-primary { border-color: var(--cm-primary); }
+      .ring-primary { --tw-ring-color: var(--cm-primary); }
+      .bg-primary-foreground { background-color: var(--cm-primary-foreground); }
+      .text-primary-foreground { color: var(--cm-primary-foreground); }
+      .border-primary-foreground { border-color: var(--cm-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--cm-primary-foreground); }
+      .bg-muted { background-color: var(--cm-muted); }
+      .text-muted { color: var(--cm-muted); }
+      .border-muted { border-color: var(--cm-muted); }
+      .ring-muted { --tw-ring-color: var(--cm-muted); }
+      .bg-muted-foreground { background-color: var(--cm-muted-foreground); }
+      .text-muted-foreground { color: var(--cm-muted-foreground); }
+      .border-muted-foreground { border-color: var(--cm-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--cm-muted-foreground); }
+      .bg-border { background-color: var(--cm-border); }
+      .text-border { color: var(--cm-border); }
+      .border-border { border-color: var(--cm-border); }
+      .ring-border { --tw-ring-color: var(--cm-border); }
+      .bg-input { background-color: var(--cm-input); }
+      .text-input { color: var(--cm-input); }
+      .border-input { border-color: var(--cm-input); }
+      .ring-input { --tw-ring-color: var(--cm-input); }
+      .bg-ring { background-color: var(--cm-ring); }
+      .text-ring { color: var(--cm-ring); }
+      .border-ring { border-color: var(--cm-ring); }
+      .ring-ring { --tw-ring-color: var(--cm-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <div class="cm-mobile-wrap" data-node-id="page-quick-order" data-device-type="mobile" data-viewport-mode="document-scroll" data-page-type="task-driven" data-mobile-navigation-active-key="quick-order">
+        <header id="app-bar" class="sticky top-0 z-40 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 border-b border-border">
+            <div class="flex items-center justify-between px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+                        <i data-lucide="container" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-base font-semibold tracking-tight text-foreground">ContainerMind</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button type="button" aria-label="通知" class="cm-touch-target flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                    </button>
+                    <div class="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
+                        张
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content" class="cm-main-scroll px-4 py-4 space-y-5 overflow-x-hidden">
+            <section id="greeting" class="space-y-1">
+                <h1 class="text-xl font-semibold text-foreground cm-heading">下午好，张经理</h1>
+                <p class="text-sm text-muted-foreground">一句话录入意向订单，AI 秒级排产分析</p>
+            </section>
+
+            <section id="quick-templates" class="space-y-2">
+                <p class="text-xs font-medium text-muted-foreground">快捷模板</p>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                    <button type="button" class="shrink-0 px-3 py-2 rounded-lg bg-card border border-border text-xs text-foreground shadow-sm active:bg-muted transition-colors">40HC 1000台 9月底交付</button>
+                    <button type="button" class="shrink-0 px-3 py-2 rounded-lg bg-card border border-border text-xs text-foreground shadow-sm active:bg-muted transition-colors">20GP 200台 10月要</button>
+                    <button type="button" class="shrink-0 px-3 py-2 rounded-lg bg-card border border-border text-xs text-foreground shadow-sm active:bg-muted transition-colors">Ener C+ 50台 急单</button>
+                </div>
+            </section>
+
+            <section id="input-area" class="bg-card rounded-2xl border border-border p-3 shadow-sm">
+                <label for="order-input" class="sr-only">订单意向录入</label>
+                <div class="relative">
+                    <textarea id="order-input" rows="4" placeholder="例如：意向新订单，40HC箱型，总数量1000，计划2026.09.30交付，交付地点上海" class="w-full resize-none rounded-xl bg-muted/50 border border-border p-3 pr-12 pb-12 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring min-h-[120px]"></textarea>
+                    <button type="button" aria-label="语音输入" class="absolute bottom-3 left-3 w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground active:bg-muted transition-colors">
+                        <i data-lucide="mic" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" aria-label="发送" class="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-sm active:opacity-90 transition-opacity">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </section>
+
+            <section id="result-card" class="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div class="px-4 py-3 border-b border-border flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">排产可行</span>
+                        <span class="text-xs text-muted-foreground">风险低</span>
+                    </div>
+                    <span class="text-xs text-muted-foreground">刚刚</span>
+                </div>
+
+                <div class="px-4 py-4 space-y-5">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-xl bg-muted/50 p-3">
+                            <p class="text-xs text-muted-foreground mb-1">箱型</p>
+                            <p class="text-sm font-semibold text-foreground">40HC</p>
+                        </div>
+                        <div class="rounded-xl bg-muted/50 p-3">
+                            <p class="text-xs text-muted-foreground mb-1">数量</p>
+                            <p class="text-sm font-semibold text-foreground">1,000 台</p>
+                        </div>
+                        <div class="rounded-xl bg-muted/50 p-3">
+                            <p class="text-xs text-muted-foreground mb-1">TEU</p>
+                            <p class="text-sm font-semibold text-foreground">1,000 TEU</p>
+                        </div>
+                        <div class="rounded-xl bg-muted/50 p-3">
+                            <p class="text-xs text-muted-foreground mb-1">交付日期</p>
+                            <p class="text-sm font-semibold text-foreground">2026.09.30</p>
+                        </div>
+                        <div class="col-span-2 rounded-xl bg-muted/50 p-3">
+                            <p class="text-xs text-muted-foreground mb-1">交付地点</p>
+                            <p class="text-sm font-semibold text-foreground">上海</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="calendar-check" class="w-4 h-4 text-primary"></i>
+                            <h3 class="text-sm font-semibold text-foreground">建议排产期</h3>
+                        </div>
+                        <div class="rounded-xl bg-muted/50 p-3 space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-muted-foreground">2026.08.18 — 08.31</span>
+                                <span class="text-primary font-medium">壳体预制</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-muted-foreground">2026.09.01 — 09.15</span>
+                                <span class="text-primary font-medium">总装喷涂</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-muted-foreground">2026.09.16 — 09.28</span>
+                                <span class="text-primary font-medium">质检出库</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="gauge" class="w-4 h-4 text-primary"></i>
+                            <h3 class="text-sm font-semibold text-foreground">产能影响</h3>
+                        </div>
+                        <div class="flex items-center gap-4 rounded-xl bg-muted/50 p-3">
+                            <div class="flex-1 text-center">
+                                <p class="text-xs text-muted-foreground mb-1">当前利用率</p>
+                                <p class="text-lg font-semibold text-foreground cm-tabular">72%</p>
+                            </div>
+                            <div class="text-muted-foreground">
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </div>
+                            <div class="flex-1 text-center">
+                                <p class="text-xs text-muted-foreground mb-1">接单后</p>
+                                <p class="text-lg font-semibold text-primary cm-tabular">89%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="package-check" class="w-4 h-4 text-primary"></i>
+                            <h3 class="text-sm font-semibold text-foreground">物料齐套检查</h3>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="rounded-xl bg-emerald-50 p-2 text-center">
+                                <p class="text-xs font-medium text-emerald-700">钢板</p>
+                                <p class="text-[10px] text-emerald-600">充足</p>
+                            </div>
+                            <div class="rounded-xl bg-emerald-50 p-2 text-center">
+                                <p class="text-xs font-medium text-emerald-700">油漆</p>
+                                <p class="text-[10px] text-emerald-600">充足</p>
+                            </div>
+                            <div class="rounded-xl bg-amber-50 p-2 text-center">
+                                <p class="text-xs font-medium text-amber-700">角件</p>
+                                <p class="text-[10px] text-amber-600">需补货</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="alert-triangle" class="w-4 h-4" style="color:var(--cm-state-warning)"></i>
+                            <h3 class="text-sm font-semibold text-foreground">风险提醒</h3>
+                        </div>
+                        <ul class="space-y-2">
+                            <li class="flex items-start gap-2 rounded-xl p-3 text-xs text-foreground" style="background-color:var(--cm-state-warning-bg)">
+                                <span class="mt-0.5 w-1.5 h-1.5 rounded-full shrink-0" style="background-color:var(--cm-state-warning)"></span>
+                                <span>角件库存预计 08.22 低于安全线，建议提前 3 天触发采购。</span>
+                            </li>
+                            <li class="flex items-start gap-2 rounded-xl bg-muted/50 p-3 text-xs text-foreground">
+                                <span class="mt-0.5 w-1.5 h-1.5 rounded-full bg-muted-foreground shrink-0"></span>
+                                <span>9 月第 3 周喷涂线已有 2 个急单排队，存在轻微延期风险。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="help-circle" class="w-4 h-4 text-muted-foreground"></i>
+                            <h3 class="text-sm font-semibold text-foreground">待确认信息</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600">客户名称</span>
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600">付款方式</span>
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600">特殊配置</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <button type="button" class="col-span-2 cm-touch-target w-full rounded-xl bg-primary text-primary-foreground text-sm font-medium flex items-center justify-center gap-2 active:opacity-90 transition-opacity">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            确认录入
+                        </button>
+                        <button type="button" class="cm-touch-target w-full rounded-xl border border-border bg-card text-foreground text-sm font-medium flex items-center justify-center active:bg-muted transition-colors">
+                            调整参数
+                        </button>
+                        <button type="button" class="cm-touch-target w-full rounded-xl text-primary text-sm font-medium flex items-center justify-center active:bg-primary/5 transition-colors">
+                            查看排产
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <p class="text-center text-[11px] text-muted-foreground py-2">以上为 AI 辅助分析，正式排产需计划员确认</p>
+        </main>
+
+        <nav data-mobile-nav="global" class="cm-bottom-nav w-full bg-card border-t border-border fixed bottom-0 left-0 right-0" style="height:56px;z-index:50;">
+            <div class="w-full max-w-md mx-auto grid grid-cols-3 h-full">
+                <a href="quick-order.html" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-primary font-semibold" aria-current="page">
+                    <i data-lucide="message-square-plus" class="w-5 h-5"></i>
+                    <span class="text-[11px]">接单</span>
+                </a>
+                <a data-dom-id="nav-mobile-schedule" href="mobile-schedule.html" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-muted-foreground">
+                    <i data-lucide="calendar-days" class="w-5 h-5"></i>
+                    <span class="text-[11px]">排产</span>
+                </a>
+                <a data-dom-id="nav-mobile-approval" href="mobile-approval.html" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-muted-foreground">
+                    <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+                    <span class="text-[11px]">审批</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

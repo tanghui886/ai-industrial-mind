@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>审批中心</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+:root {
+  /* Brand primary scale — industrial tech cyan */
+  --cm-primary-50: #ecfeff;
+  --cm-primary-100: #cffafe;
+  --cm-primary-200: #a5f3fc;
+  --cm-primary-300: #67e8f9;
+  --cm-primary-400: #22d3ee;
+  --cm-primary-500: #06b6d4;
+  --cm-primary-600: #0891b2;
+  --cm-primary-700: #0e7490;
+  --cm-primary-800: #155e75;
+  --cm-primary-900: #164e63;
+
+  /* Neutral slate scale */
+  --cm-slate-50: #f8fafc;
+  --cm-slate-100: #f1f5f9;
+  --cm-slate-200: #e2e8f0;
+  --cm-slate-300: #cbd5e1;
+  --cm-slate-400: #94a3b8;
+  --cm-slate-500: #64748b;
+  --cm-slate-600: #475569;
+  --cm-slate-700: #334155;
+  --cm-slate-800: #1e293b;
+  --cm-slate-900: #0f172a;
+
+  /* Semantic tokens */
+  --cm-background: var(--cm-slate-50);
+  --cm-foreground: var(--cm-slate-900);
+  --cm-card: #ffffff;
+  --cm-card-foreground: var(--cm-slate-900);
+  --cm-popover: #ffffff;
+  --cm-popover-foreground: var(--cm-slate-900);
+  --cm-primary: var(--cm-primary-600);
+  --cm-primary-foreground: #ffffff;
+  --cm-muted: var(--cm-slate-100);
+  --cm-muted-foreground: var(--cm-slate-500);
+  --cm-border: var(--cm-slate-200);
+  --cm-input: var(--cm-slate-200);
+  --cm-ring: var(--cm-primary-400);
+
+  /* State tokens */
+  --cm-state-success: #10b981;
+  --cm-state-success-bg: #d1fae5;
+  --cm-state-warning: #f59e0b;
+  --cm-state-warning-bg: #fef3c7;
+  --cm-state-error: #ef4444;
+  --cm-state-error-bg: #fee2e2;
+  --cm-state-info: var(--cm-primary-500);
+  --cm-state-info-bg: var(--cm-primary-50);
+
+  /* Radius */
+  --cm-radius-small: 4px;
+  --cm-radius-medium: 8px;
+  --cm-radius-large: 12px;
+  --cm-radius-full: 9999px;
+
+  /* Shadows */
+  --cm-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --cm-shadow-2: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+  --cm-shadow-3: 0 24px 60px -20px rgba(15, 23, 42, 0.22);
+
+  /* Typography */
+  --cm-font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --cm-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* Spacing scale */
+  --cm-s-1: 4px;
+  --cm-s-2: 8px;
+  --cm-s-3: 12px;
+  --cm-s-4: 16px;
+  --cm-s-5: 24px;
+  --cm-s-6: 32px;
+  --cm-s-7: 48px;
+  --cm-s-8: 64px;
+}
+
+html.dark {
+  --cm-background: #0b0f19;
+  --cm-foreground: #f1f5f9;
+  --cm-card: #111827;
+  --cm-card-foreground: #f1f5f9;
+  --cm-popover: #111827;
+  --cm-popover-foreground: #f1f5f9;
+  --cm-muted: #1e293b;
+  --cm-muted-foreground: #94a3b8;
+  --cm-border: #1e293b;
+  --cm-input: #1e293b;
+}
+
+body {
+  font-family: var(--cm-font-sans);
+  background-color: var(--cm-background);
+  color: var(--cm-foreground);
+}
+
+.cm-heading {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.cm-kpi-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cm-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--cm-background);
+    --color-foreground: var(--cm-foreground);
+    --color-card: var(--cm-card);
+    --color-card-foreground: var(--cm-card-foreground);
+    --color-popover: var(--cm-popover);
+    --color-popover-foreground: var(--cm-popover-foreground);
+    --color-primary: var(--cm-primary);
+    --color-primary-foreground: var(--cm-primary-foreground);
+    --color-muted: var(--cm-muted);
+    --color-muted-foreground: var(--cm-muted-foreground);
+    --color-border: var(--cm-border);
+    --color-input: var(--cm-input);
+    --color-ring: var(--cm-ring);
+    --radius-sm: var(--cm-radius-small);
+    --radius-md: var(--cm-radius-medium);
+    --radius-lg: var(--cm-radius-large);
+  }
+  @layer base {
+    body { background: var(--cm-background); color: var(--cm-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--cm-background); }
+      .text-background { color: var(--cm-background); }
+      .border-background { border-color: var(--cm-background); }
+      .ring-background { --tw-ring-color: var(--cm-background); }
+      .bg-foreground { background-color: var(--cm-foreground); }
+      .text-foreground { color: var(--cm-foreground); }
+      .border-foreground { border-color: var(--cm-foreground); }
+      .ring-foreground { --tw-ring-color: var(--cm-foreground); }
+      .bg-card { background-color: var(--cm-card); }
+      .text-card { color: var(--cm-card); }
+      .border-card { border-color: var(--cm-card); }
+      .ring-card { --tw-ring-color: var(--cm-card); }
+      .bg-card-foreground { background-color: var(--cm-card-foreground); }
+      .text-card-foreground { color: var(--cm-card-foreground); }
+      .border-card-foreground { border-color: var(--cm-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--cm-card-foreground); }
+      .bg-popover { background-color: var(--cm-popover); }
+      .text-popover { color: var(--cm-popover); }
+      .border-popover { border-color: var(--cm-popover); }
+      .ring-popover { --tw-ring-color: var(--cm-popover); }
+      .bg-popover-foreground { background-color: var(--cm-popover-foreground); }
+      .text-popover-foreground { color: var(--cm-popover-foreground); }
+      .border-popover-foreground { border-color: var(--cm-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--cm-popover-foreground); }
+      .bg-primary { background-color: var(--cm-primary); }
+      .text-primary { color: var(--cm-primary); }
+      .border-primary { border-color: var(--cm-primary); }
+      .ring-primary { --tw-ring-color: var(--cm-primary); }
+      .bg-primary-foreground { background-color: var(--cm-primary-foreground); }
+      .text-primary-foreground { color: var(--cm-primary-foreground); }
+      .border-primary-foreground { border-color: var(--cm-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--cm-primary-foreground); }
+      .bg-muted { background-color: var(--cm-muted); }
+      .text-muted { color: var(--cm-muted); }
+      .border-muted { border-color: var(--cm-muted); }
+      .ring-muted { --tw-ring-color: var(--cm-muted); }
+      .bg-muted-foreground { background-color: var(--cm-muted-foreground); }
+      .text-muted-foreground { color: var(--cm-muted-foreground); }
+      .border-muted-foreground { border-color: var(--cm-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--cm-muted-foreground); }
+      .bg-border { background-color: var(--cm-border); }
+      .text-border { color: var(--cm-border); }
+      .border-border { border-color: var(--cm-border); }
+      .ring-border { --tw-ring-color: var(--cm-border); }
+      .bg-input { background-color: var(--cm-input); }
+      .text-input { color: var(--cm-input); }
+      .border-input { border-color: var(--cm-input); }
+      .ring-input { --tw-ring-color: var(--cm-input); }
+      .bg-ring { background-color: var(--cm-ring); }
+      .text-ring { color: var(--cm-ring); }
+      .border-ring { border-color: var(--cm-ring); }
+      .ring-ring { --tw-ring-color: var(--cm-ring); }
+    </style>
+    <style id="critical-layout">
+      html, body { overflow-x: hidden; }
+      .cm-mobile-wrap {
+        max-width: 430px;
+        margin: 0 auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        background: var(--cm-background);
+        position: relative;
+        overflow-x: hidden;
+      }
+      .cm-main-scroll {
+        padding-bottom: calc(56px + env(safe-area-inset-bottom));
+      }
+      .cm-bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      .cm-safe-top { padding-top: env(safe-area-inset-top); }
+      .touch-action { touch-action: manipulation; }
+      .line-clamp-1 {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <div class="cm-mobile-wrap" data-node-id="page-mobile-approval" data-device-type="mobile" data-viewport-mode="document-scroll" data-page-type="task-driven">
+    <main class="cm-main-scroll cm-safe-top">
+      <!-- App bar -->
+      <header class="sticky top-0 z-40 bg-card border-b border-border" style="box-shadow: var(--cm-shadow-1);">
+        <div class="flex items-center justify-between px-4" style="height: 56px;">
+          <div class="flex flex-col">
+            <span class="text-[10px] font-medium text-muted-foreground tracking-wide">ContainerMind</span>
+            <h1 class="text-lg font-semibold text-foreground leading-tight">审批中心</h1>
+          </div>
+          <button type="button" class="touch-action flex items-center justify-center w-10 h-10 rounded-full active:bg-muted transition-colors" aria-label="筛选">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5 text-foreground"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Filter tabs -->
+      <section id="filter-tabs" class="bg-card border-b border-border px-4 pt-3 pb-0">
+        <div class="flex items-center gap-2 no-scrollbar overflow-x-auto" role="tablist" aria-label="审批筛选">
+          <button type="button" role="tab" aria-selected="true" class="touch-action relative shrink-0 px-4 py-2 text-sm font-semibold text-primary border-b-2 border-primary transition-colors">
+            待审批
+            <span class="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-medium rounded-full bg-primary-100 text-primary" style="background-color: var(--cm-primary-50);">5</span>
+          </button>
+          <button type="button" role="tab" aria-selected="false" class="touch-action shrink-0 px-4 py-2 text-sm font-medium text-muted-foreground border-b-2 border-transparent hover:text-foreground transition-colors">
+            已审批
+          </button>
+          <button type="button" role="tab" aria-selected="false" class="touch-action shrink-0 px-4 py-2 text-sm font-medium text-muted-foreground border-b-2 border-transparent hover:text-foreground transition-colors">
+            我发起的
+          </button>
+        </div>
+      </section>
+
+      <!-- Approval cards -->
+      <section id="approval-cards" class="px-4 py-4 space-y-3">
+        <!-- Card 1 -->
+        <article class="bg-card rounded-xl border border-border p-4" style="box-shadow: var(--cm-shadow-1);">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-primary-50 text-primary" style="background-color: var(--cm-primary-50); color: var(--cm-primary);">排产变更</span>
+                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--cm-state-error-bg)] text-[var(--cm-state-error)]">高优先级</span>
+              </div>
+              <h2 class="text-[15px] font-semibold text-foreground line-clamp-1">排产变更申请 - DFQD-2026-285-DS 提前2天</h2>
+              <p class="mt-1 text-xs text-muted-foreground">申请人：李计划 · 09:30</p>
+            </div>
+            <div class="shrink-0 mt-0.5">
+              <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full bg-[var(--cm-state-warning-bg)] text-[var(--cm-state-warning)]">待审批</span>
+            </div>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <button type="button" class="touch-action flex-1 inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium rounded-lg bg-primary text-primary-foreground active:opacity-90 transition-opacity">
+              <i data-lucide="check" class="w-4 h-4"></i>通过
+            </button>
+            <button type="button" class="touch-action flex-1 inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium rounded-lg border border-[var(--cm-state-error)] text-[var(--cm-state-error)] bg-card active:bg-[var(--cm-state-error-bg)] transition-colors">
+              <i data-lucide="x" class="w-4 h-4"></i>驳回
+            </button>
+          </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="bg-card rounded-xl border border-border p-4" style="box-shadow: var(--cm-shadow-1);">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--cm-state-error-bg)] text-[var(--cm-state-error)]">紧急维修</span>
+                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--cm-state-error-bg)] text-[var(--cm-state-error)]">高优先级</span>
+              </div>
+              <h2 class="text-[15px] font-semibold text-foreground line-clamp-1">焊接机器人送丝异常</h2>
+              <p class="mt-1 text-xs text-muted-foreground">申请人：王设备 · 10:15</p>
+            </div>
+            <div class="shrink-0 mt-0.5">
+              <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full bg-[var(--cm-state-warning-bg)] text-[var(--cm-state-warning)]">待审批</span>
+            </div>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <button type="button" class="touch-action flex-1 inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium rounded-lg bg-primary text-primary-foreground active:opacity-90 transition-opacity">
+              <i data-lucide="check" class="w-4 h-4"></i>通过
+            </button>
+            <button type="button" class="touch-action flex-1 inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium rounded-lg border border-[var(--cm-state-error)] text-[var(--cm-state-error)] bg-card active:bg-[var(--cm-state-error-bg)] transition-colors">
+              <i data-lucide="x" class="w-4 h-4"></i>驳回
+            </button>
+          </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="bg-card rounded-xl border border-border p-4" style="box-shadow: var(--cm-shadow-1);">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-primary-50 text-primary" style="background-color: var(--cm-primary-50); color: var(--cm-primary);">样箱插单</span>
+                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--cm-state-info-bg)] text-[var(--cm-state-info)]">普通</span>
+              </div>
+              <h2 class="text-[15px] font-semibold text-foreground line-clamp-1">样箱插单 - Ener C+ 2台</h2>
+              <p class="mt-1 text-xs text-muted-foreground">申请人：张业务 · 11:00</p>
+            </div>
+            <div class="shrink-0 mt-0.5">
+              <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full bg-[var(--cm-state-warning-bg)] text-[var(--cm-state-warning)]">待审批</span>
+            </div>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <button type="button" class="touch-action flex-1 inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium rounded-lg bg-primary text-primary-foreground active:opacity-90 transition-opacity">
+              <i data-lucide="check" class="w-4 h-4"></i>通过
+            </button>
+            <button type="button" class="touch-action flex-1 inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium rounded-lg border border-[var(--cm-state-error)] text-[var(--cm-state-error)] bg-card active:bg-[var(--cm-state-error-bg)] transition-colors">
+              <i data-lucide="x" class="w-4 h-4"></i>驳回
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <!-- Detail bottom sheet (static visible example) -->
+      <section id="approval-detail" class="px-4 pb-4">
+        <div class="bg-card rounded-t-2xl rounded-b-2xl border border-border overflow-hidden" style="box-shadow: var(--cm-shadow-2);">
+          <div class="px-4 pt-3 pb-2 border-b border-border flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-1 h-4 rounded-full bg-primary"></div>
+              <h3 class="text-sm font-semibold text-foreground">审批详情</h3>
+            </div>
+            <span class="text-[10px] text-muted-foreground">DFQD-2026-285-DS</span>
+          </div>
+          <div class="p-4 space-y-3">
+            <div class="grid grid-cols-[64px_1fr] gap-x-3 gap-y-2 text-sm">
+              <span class="text-muted-foreground">申请原因</span>
+              <span class="text-foreground">客户要求提前交付，需将原计划 8 月 22 日的订单提前 2 天投产。</span>
+              <span class="text-muted-foreground">影响产线</span>
+              <span class="text-foreground">焊接线 A、装配线 B 需临时调整排班。</span>
+              <span class="text-muted-foreground">原方案</span>
+              <span class="text-foreground">8 月 22 日 08:00 启动，标准双班生产。</span>
+              <span class="text-muted-foreground">新方案</span>
+              <span class="text-foreground">8 月 20 日 08:00 启动，增加 1 个晚班补齐产能。</span>
+              <span class="text-muted-foreground">风险提示</span>
+              <span class="text-[var(--cm-state-error)]">加班费用增加，且可能影响下周保养窗口。</span>
+            </div>
+            <div class="pt-2 flex items-center gap-2">
+              <button type="button" class="touch-action flex-1 inline-flex items-center justify-center gap-1.5 h-10 px-3 text-sm font-semibold rounded-lg bg-primary text-primary-foreground active:opacity-90 transition-opacity">
+                <i data-lucide="check" class="w-4 h-4"></i>通过
+              </button>
+              <button type="button" class="touch-action flex-1 inline-flex items-center justify-center gap-1.5 h-10 px-3 text-sm font-semibold rounded-lg border border-[var(--cm-state-error)] text-[var(--cm-state-error)] bg-card active:bg-[var(--cm-state-error-bg)] transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>驳回
+              </button>
+              <button type="button" class="touch-action flex-1 inline-flex items-center justify-center gap-1.5 h-10 px-3 text-sm font-semibold rounded-lg border border-border text-foreground bg-card active:bg-muted transition-colors">
+                <i data-lucide="arrow-right-left" class="w-4 h-4"></i>转交
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Empty state (hidden by default) -->
+      <section id="empty-state" class="hidden px-4 py-12 text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-3">
+          <i data-lucide="clipboard-check" class="w-7 h-7 text-muted-foreground"></i>
+        </div>
+        <p class="text-sm font-medium text-foreground">暂无审批记录</p>
+        <p class="mt-1 text-xs text-muted-foreground">当前筛选条件下没有相关审批</p>
+      </section>
+    </main>
+
+    <!-- Bottom tab navigation -->
+    <nav data-mobile-nav="global" class="cm-bottom-nav w-full bg-card border-t border-border fixed bottom-0 left-0 right-0" style="height:56px;z-index:50;">
+      <div class="grid grid-cols-3 items-center h-full max-w-[430px] mx-auto">
+        <a data-dom-id="nav-quick-order" href="quick-order.html" class="touch-action flex flex-col items-center justify-center gap-0.5 h-full text-muted-foreground hover:text-foreground transition-colors">
+          <i data-lucide="message-square-plus" class="w-5 h-5"></i>
+          <span class="text-[10px]">接单</span>
+        </a>
+        <a data-dom-id="nav-mobile-schedule" href="mobile-schedule.html" class="touch-action flex flex-col items-center justify-center gap-0.5 h-full text-muted-foreground hover:text-foreground transition-colors">
+          <i data-lucide="calendar-days" class="w-5 h-5"></i>
+          <span class="text-[10px]">排产</span>
+        </a>
+        <a href="mobile-approval.html" class="touch-action flex flex-col items-center justify-center gap-0.5 h-full text-primary font-semibold" aria-current="page">
+          <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+          <span class="text-[10px]">审批</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>

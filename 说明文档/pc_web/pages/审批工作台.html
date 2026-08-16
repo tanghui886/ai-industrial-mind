@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审批工作台</title>
+    <style id="theme-vars">
+:root {
+  /* Brand primary scale — industrial tech cyan */
+  --cm-primary-50: #ecfeff;
+  --cm-primary-100: #cffafe;
+  --cm-primary-200: #a5f3fc;
+  --cm-primary-300: #67e8f9;
+  --cm-primary-400: #22d3ee;
+  --cm-primary-500: #06b6d4;
+  --cm-primary-600: #0891b2;
+  --cm-primary-700: #0e7490;
+  --cm-primary-800: #155e75;
+  --cm-primary-900: #164e63;
+
+  /* Neutral slate scale */
+  --cm-slate-50: #f8fafc;
+  --cm-slate-100: #f1f5f9;
+  --cm-slate-200: #e2e8f0;
+  --cm-slate-300: #cbd5e1;
+  --cm-slate-400: #94a3b8;
+  --cm-slate-500: #64748b;
+  --cm-slate-600: #475569;
+  --cm-slate-700: #334155;
+  --cm-slate-800: #1e293b;
+  --cm-slate-900: #0f172a;
+
+  /* Semantic tokens */
+  --cm-background: var(--cm-slate-50);
+  --cm-foreground: var(--cm-slate-900);
+  --cm-card: #ffffff;
+  --cm-card-foreground: var(--cm-slate-900);
+  --cm-popover: #ffffff;
+  --cm-popover-foreground: var(--cm-slate-900);
+  --cm-primary: var(--cm-primary-600);
+  --cm-primary-foreground: #ffffff;
+  --cm-muted: var(--cm-slate-100);
+  --cm-muted-foreground: var(--cm-slate-500);
+  --cm-border: var(--cm-slate-200);
+  --cm-input: var(--cm-slate-200);
+  --cm-ring: var(--cm-primary-400);
+
+  /* State tokens */
+  --cm-state-success: #10b981;
+  --cm-state-success-bg: #d1fae5;
+  --cm-state-warning: #f59e0b;
+  --cm-state-warning-bg: #fef3c7;
+  --cm-state-error: #ef4444;
+  --cm-state-error-bg: #fee2e2;
+  --cm-state-info: var(--cm-primary-500);
+  --cm-state-info-bg: var(--cm-primary-50);
+
+  /* Radius */
+  --cm-radius-small: 4px;
+  --cm-radius-medium: 8px;
+  --cm-radius-large: 12px;
+  --cm-radius-full: 9999px;
+
+  /* Shadows */
+  --cm-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --cm-shadow-2: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+  --cm-shadow-3: 0 24px 60px -20px rgba(15, 23, 42, 0.22);
+
+  /* Typography */
+  --cm-font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --cm-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* Spacing scale */
+  --cm-s-1: 4px;
+  --cm-s-2: 8px;
+  --cm-s-3: 12px;
+  --cm-s-4: 16px;
+  --cm-s-5: 24px;
+  --cm-s-6: 32px;
+  --cm-s-7: 48px;
+  --cm-s-8: 64px;
+}
+
+html.dark {
+  --cm-background: #0b0f19;
+  --cm-foreground: #f1f5f9;
+  --cm-card: #111827;
+  --cm-card-foreground: #f1f5f9;
+  --cm-popover: #111827;
+  --cm-popover-foreground: #f1f5f9;
+  --cm-muted: #1e293b;
+  --cm-muted-foreground: #94a3b8;
+  --cm-border: #1e293b;
+  --cm-input: #1e293b;
+}
+
+body {
+  font-family: var(--cm-font-sans);
+  background-color: var(--cm-background);
+  color: var(--cm-foreground);
+}
+
+.cm-heading {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.cm-kpi-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cm-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--cm-background);
+    --color-foreground: var(--cm-foreground);
+    --color-card: var(--cm-card);
+    --color-card-foreground: var(--cm-card-foreground);
+    --color-popover: var(--cm-popover);
+    --color-popover-foreground: var(--cm-popover-foreground);
+    --color-primary: var(--cm-primary);
+    --color-primary-foreground: var(--cm-primary-foreground);
+    --color-muted: var(--cm-muted);
+    --color-muted-foreground: var(--cm-muted-foreground);
+    --color-border: var(--cm-border);
+    --color-input: var(--cm-input);
+    --color-ring: var(--cm-ring);
+    --radius-sm: var(--cm-radius-small);
+    --radius-md: var(--cm-radius-medium);
+    --radius-lg: var(--cm-radius-large);
+  }
+  @layer base {
+    body { background: var(--cm-background); color: var(--cm-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--cm-background); }
+      .text-background { color: var(--cm-background); }
+      .border-background { border-color: var(--cm-background); }
+      .ring-background { --tw-ring-color: var(--cm-background); }
+      .bg-foreground { background-color: var(--cm-foreground); }
+      .text-foreground { color: var(--cm-foreground); }
+      .border-foreground { border-color: var(--cm-foreground); }
+      .ring-foreground { --tw-ring-color: var(--cm-foreground); }
+      .bg-card { background-color: var(--cm-card); }
+      .text-card { color: var(--cm-card); }
+      .border-card { border-color: var(--cm-card); }
+      .ring-card { --tw-ring-color: var(--cm-card); }
+      .bg-card-foreground { background-color: var(--cm-card-foreground); }
+      .text-card-foreground { color: var(--cm-card-foreground); }
+      .border-card-foreground { border-color: var(--cm-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--cm-card-foreground); }
+      .bg-popover { background-color: var(--cm-popover); }
+      .text-popover { color: var(--cm-popover); }
+      .border-popover { border-color: var(--cm-popover); }
+      .ring-popover { --tw-ring-color: var(--cm-popover); }
+      .bg-popover-foreground { background-color: var(--cm-popover-foreground); }
+      .text-popover-foreground { color: var(--cm-popover-foreground); }
+      .border-popover-foreground { border-color: var(--cm-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--cm-popover-foreground); }
+      .bg-primary { background-color: var(--cm-primary); }
+      .text-primary { color: var(--cm-primary); }
+      .border-primary { border-color: var(--cm-primary); }
+      .ring-primary { --tw-ring-color: var(--cm-primary); }
+      .bg-primary-foreground { background-color: var(--cm-primary-foreground); }
+      .text-primary-foreground { color: var(--cm-primary-foreground); }
+      .border-primary-foreground { border-color: var(--cm-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--cm-primary-foreground); }
+      .bg-muted { background-color: var(--cm-muted); }
+      .text-muted { color: var(--cm-muted); }
+      .border-muted { border-color: var(--cm-muted); }
+      .ring-muted { --tw-ring-color: var(--cm-muted); }
+      .bg-muted-foreground { background-color: var(--cm-muted-foreground); }
+      .text-muted-foreground { color: var(--cm-muted-foreground); }
+      .border-muted-foreground { border-color: var(--cm-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--cm-muted-foreground); }
+      .bg-border { background-color: var(--cm-border); }
+      .text-border { color: var(--cm-border); }
+      .border-border { border-color: var(--cm-border); }
+      .ring-border { --tw-ring-color: var(--cm-border); }
+      .bg-input { background-color: var(--cm-input); }
+      .text-input { color: var(--cm-input); }
+      .border-input { border-color: var(--cm-input); }
+      .ring-input { --tw-ring-color: var(--cm-input); }
+      .bg-ring { background-color: var(--cm-ring); }
+      .text-ring { color: var(--cm-ring); }
+      .border-ring { border-color: var(--cm-ring); }
+      .ring-ring { --tw-ring-color: var(--cm-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased bg-background text-foreground">
+  <!-- App bar -->
+  <header class="app-bar sticky top-0 z-40 w-full border-b border-border bg-card/95 backdrop-blur">
+    <div class="flex h-14 items-center justify-between px-6">
+      <div class="flex items-center gap-3">
+        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <i data-lucide="box" class="h-5 w-5"></i>
+        </div>
+        <span class="text-lg font-semibold tracking-tight">ContainerMind</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-1">
+        <a id="nav-dashboard" data-dom-id="nav-dashboard" href="dashboard.html" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+          <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
+          产线总览
+        </a>
+        <a id="nav-planning" data-dom-id="nav-planning" href="planning-workbench.html" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+          <i data-lucide="calendar-days" class="h-4 w-4"></i>
+          排产工作台
+        </a>
+        <a id="nav-agent-chat" data-dom-id="nav-agent-chat" href="agent-chat.html" class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+          <i data-lucide="bot-message-square" class="h-4 w-4"></i>
+          Agent 对话台
+        </a>
+        <a href="approval.html" class="flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2 text-sm font-medium text-primary transition-colors">
+          <i data-lucide="clipboard-check" class="h-4 w-4"></i>
+          审批工作台
+        </a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <button class="relative rounded-full p-2 text-muted-foreground hover:bg-muted">
+          <i data-lucide="bell" class="h-5 w-5"></i>
+          <span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-error ring-2 ring-card"></span>
+        </button>
+        <div class="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium">张</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="px-6 py-5">
+    <!-- Page header -->
+    <section class="mb-5">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 class="cm-heading text-2xl">审批工作台</h1>
+          <p class="mt-1 text-sm text-muted-foreground">AI 辅助决策需人工确认后方可执行</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"></i>
+            <input type="text" placeholder="搜索审批编号、标题、申请人" class="h-9 w-64 rounded-md border border-input bg-card pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring" />
+          </div>
+          <select class="h-9 rounded-md border border-input bg-card px-3 text-sm text-muted-foreground outline-none focus:ring-2 focus:ring-ring">
+            <option>全部类型</option>
+            <option>排产变更</option>
+            <option>设备维修</option>
+            <option>采购申请</option>
+            <option>成本分摊</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-center gap-2 border-b border-border pb-3">
+        <button class="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground">待审批 <span class="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-xs">5</span></button>
+        <button class="rounded-full border border-input bg-card px-4 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted">已审批</button>
+        <button class="rounded-full border border-input bg-card px-4 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted">我发起的</button>
+        <button class="rounded-full border border-input bg-card px-4 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted">全部</button>
+      </div>
+    </section>
+
+    <!-- Two-column approval layout -->
+    <section class="cm-approval-layout">
+      <!-- Left: approval list -->
+      <div class="cm-approval-list">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold text-muted-foreground">待审批列表</h2>
+          <span class="text-xs text-muted-foreground">共 5 条</span>
+        </div>
+        <div class="flex flex-col gap-3 overflow-y-auto pr-1" style="max-height: calc(100vh - 240px);">
+          <!-- Active card -->
+          <article class="cursor-pointer rounded-xl border-2 border-primary bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="rounded-md bg-info/10 px-2 py-0.5 text-xs font-medium text-info">排产变更</span>
+                  <span class="rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">高优先级</span>
+                </div>
+                <h3 class="mt-2 truncate text-base font-semibold">产线 A3 排产变更：插入样箱订单</h3>
+                <p class="mt-1 line-clamp-2 text-sm text-muted-foreground">因客户加急样箱需求，AI 建议调整 8 月 14 日白班计划，将部分常规订单后移 2 天。</p>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+              <div class="flex items-center gap-3">
+                <span class="flex items-center gap-1"><i data-lucide="user" class="h-3 w-3"></i> 李明 · 计划员</span>
+                <span class="flex items-center gap-1"><i data-lucide="clock" class="h-3 w-3"></i> 10:23</span>
+              </div>
+              <span class="rounded-full bg-info/10 px-2 py-0.5 text-xs font-medium text-info">待审批</span>
+            </div>
+          </article>
+
+          <article class="cursor-pointer rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="rounded-md bg-error/10 px-2 py-0.5 text-xs font-medium text-error">紧急维修</span>
+                  <span class="rounded-full bg-error/10 px-2 py-0.5 text-xs font-medium text-error">紧急</span>
+                </div>
+                <h3 class="mt-2 truncate text-base font-semibold">注塑机 M-204 停机紧急维修</h3>
+                <p class="mt-1 line-clamp-2 text-sm text-muted-foreground">模具温控异常触发预测性维护告警，需立即停机检修并启用备用机台。</p>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+              <div class="flex items-center gap-3">
+                <span class="flex items-center gap-1"><i data-lucide="user" class="h-3 w-3"></i> 王强 · 设备主管</span>
+                <span class="flex items-center gap-1"><i data-lucide="clock" class="h-3 w-3"></i> 09:45</span>
+              </div>
+              <span class="rounded-full bg-info/10 px-2 py-0.5 text-xs font-medium text-info">待审批</span>
+            </div>
+          </article>
+
+          <article class="cursor-pointer rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="rounded-md bg-success/10 px-2 py-0.5 text-xs font-medium text-success">采购申请</span>
+                  <span class="rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">高优先级</span>
+                </div>
+                <h3 class="mt-2 truncate text-base font-semibold">新增 HDPE 原料 12 吨采购申请</h3>
+                <p class="mt-1 line-clamp-2 text-sm text-muted-foreground">下周订单峰值预测消耗超出安全库存，建议补库并锁定供应商交付窗口。</p>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+              <div class="flex items-center gap-3">
+                <span class="flex items-center gap-1"><i data-lucide="user" class="h-3 w-3"></i> 陈晨 · 采购专员</span>
+                <span class="flex items-center gap-1"><i data-lucide="clock" class="h-3 w-3"></i> 昨天</span>
+              </div>
+              <span class="rounded-full bg-info/10 px-2 py-0.5 text-xs font-medium text-info">待审批</span>
+            </div>
+          </article>
+
+          <article class="cursor-pointer rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="rounded-md bg-info/10 px-2 py-0.5 text-xs font-medium text-info">排产变更</span>
+                  <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">普通</span>
+                </div>
+                <h3 class="mt-2 truncate text-base font-semibold">产线 B1 班次调整：夜班产能提升</h3>
+                <p class="mt-1 line-clamp-2 text-sm text-muted-foreground">根据订单交期压力，建议 B1 产线本周末增加一次夜班，以释放 15% 产能。</p>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+              <div class="flex items-center gap-3">
+                <span class="flex items-center gap-1"><i data-lucide="user" class="h-3 w-3"></i> 赵敏 · 计划员</span>
+                <span class="flex items-center gap-1"><i data-lucide="clock" class="h-3 w-3"></i> 昨天</span>
+              </div>
+              <span class="rounded-full bg-info/10 px-2 py-0.5 text-xs font-medium text-info">待审批</span>
+            </div>
+          </article>
+
+          <article class="cursor-pointer rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="rounded-md bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">成本分摊</span>
+                  <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">普通</span>
+                </div>
+                <h3 class="mt-2 truncate text-base font-semibold">共享模具成本按订单量分摊</h3>
+                <p class="mt-1 line-clamp-2 text-sm text-muted-foreground">多订单共用模具费用需按实际产量比例进行成本归集与分摊确认。</p>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+              <div class="flex items-center gap-3">
+                <span class="flex items-center gap-1"><i data-lucide="user" class="h-3 w-3"></i> 孙丽 · 财务专员</span>
+                <span class="flex items-center gap-1"><i data-lucide="clock" class="h-3 w-3"></i> 前天</span>
+              </div>
+              <span class="rounded-full bg-info/10 px-2 py-0.5 text-xs font-medium text-info">待审批</span>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Right: approval detail -->
+      <div class="cm-approval-detail">
+        <div class="flex h-full flex-col rounded-xl border border-border bg-card shadow-sm">
+          <!-- Detail header -->
+          <div class="border-b border-border p-5">
+            <div class="flex items-start justify-between gap-4">
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-xs font-mono text-muted-foreground">AP-2026-0814-003</span>
+                  <span class="rounded-md bg-info/10 px-2 py-0.5 text-xs font-medium text-info">排产变更</span>
+                  <span class="rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">高优先级</span>
+                </div>
+                <h2 class="cm-heading mt-2 text-xl">产线 A3 排产变更：插入样箱订单</h2>
+                <div class="mt-2 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                  <span class="flex items-center gap-1"><i data-lucide="user" class="h-4 w-4"></i> 申请人：李明 · 计划员</span>
+                  <span class="flex items-center gap-1"><i data-lucide="clock" class="h-4 w-4"></i> 提交时间：2026-08-14 10:23</span>
+                  <span class="flex items-center gap-1"><i data-lucide="shield-check" class="h-4 w-4"></i> 状态：<span class="font-medium text-info">待审批</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info grid -->
+          <div class="grid grid-cols-2 gap-4 border-b border-border p-5 lg:grid-cols-3">
+            <div>
+              <p class="text-xs text-muted-foreground">审批类型</p>
+              <p class="mt-1 text-sm font-medium">排产变更</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground">影响产线</p>
+              <p class="mt-1 text-sm font-medium">A3 注塑产线</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground">期望生效时间</p>
+              <p class="mt-1 text-sm font-medium">2026-08-14 12:00</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground">风险等级</p>
+              <p class="mt-1 text-sm font-medium text-warning">中风险</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground">关联 Agent</p>
+              <p class="mt-1 text-sm font-medium">Scheduler-Agent v2.4</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground">需双签</p>
+              <p class="mt-1 text-sm font-medium">是 · 计划主管</p>
+            </div>
+          </div>
+
+          <!-- Content body -->
+          <div class="flex-1 overflow-y-auto p-5" style="max-height: calc(100vh - 420px);">
+            <div class="space-y-5">
+              <div>
+                <h3 class="text-sm font-semibold">变更原因</h3>
+                <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">客户 A 于 8 月 13 日提交加急样箱订单（PO-2026-0813-91），要求 8 月 18 日前交付首件。当前 A3 产线白班计划已满，AI 建议插入样箱订单并后移部分低优先级常规订单。</p>
+              </div>
+
+              <div class="grid gap-4 md:grid-cols-2">
+                <div class="rounded-lg border border-border bg-muted/30 p-4">
+                  <h4 class="text-xs font-semibold text-muted-foreground">原方案</h4>
+                  <ul class="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                    <li class="flex items-start gap-2"><i data-lucide="minus" class="mt-0.5 h-3.5 w-3.5 shrink-0"></i> 8/14 白班：常规订单 B-1104 ~ B-1108</li>
+                    <li class="flex items-start gap-2"><i data-lucide="minus" class="mt-0.5 h-3.5 w-3.5 shrink-0"></i> 样箱订单未排入计划</li>
+                    <li class="flex items-start gap-2"><i data-lucide="minus" class="mt-0.5 h-3.5 w-3.5 shrink-0"></i> 预估首件交付：8 月 21 日</li>
+                  </ul>
+                </div>
+                <div class="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                  <h4 class="text-xs font-semibold text-primary">新方案</h4>
+                  <ul class="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                    <li class="flex items-start gap-2"><i data-lucide="plus" class="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary"></i> 8/14 白班：插入样箱订单首件</li>
+                    <li class="flex items-start gap-2"><i data-lucide="plus" class="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary"></i> B-1104 ~ B-1106 后移至 8/16 ~ 8/17</li>
+                    <li class="flex items-start gap-2"><i data-lucide="plus" class="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary"></i> 预估首件交付：8 月 17 日</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="grid gap-4 md:grid-cols-3">
+                <div class="rounded-lg border border-border p-4">
+                  <h4 class="text-xs font-semibold text-muted-foreground">产能影响</h4>
+                  <p class="mt-1 text-sm">白班利用率从 94% 降至 87%，损失约 <span class="font-semibold text-warning">14 标准箱</span>。</p>
+                </div>
+                <div class="rounded-lg border border-border p-4">
+                  <h4 class="text-xs font-semibold text-muted-foreground">物料影响</h4>
+                  <p class="mt-1 text-sm">样箱所需 HDPE 库存充足；常规订单后移不影响采购计划。</p>
+                </div>
+                <div class="rounded-lg border border-border p-4">
+                  <h4 class="text-xs font-semibold text-muted-foreground">交期影响</h4>
+                  <p class="mt-1 text-sm">样箱交期提前 4 天；3 个常规订单整体后移 <span class="font-semibold text-warning">1.5 天</span>。</p>
+                </div>
+              </div>
+
+              <!-- Attachments -->
+              <div>
+                <h3 class="text-sm font-semibold">附件材料</h3>
+                <div class="mt-2 flex flex-wrap gap-3">
+                  <a href="#" class="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm hover:bg-muted">
+                    <i data-lucide="file-text" class="h-4 w-4 text-error"></i>
+                    <span>智能排产建议报告.pdf</span>
+                  </a>
+                  <a href="#" class="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm hover:bg-muted">
+                    <i data-lucide="sheet" class="h-4 w-4 text-success"></i>
+                    <span>物料齐套检查.xlsx</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Approval trail -->
+              <div>
+                <h3 class="text-sm font-semibold">审批轨迹</h3>
+                <div class="mt-3 relative pl-4">
+                  <div class="absolute left-0 top-1.5 bottom-1.5 w-px bg-border"></div>
+                  <div class="space-y-4">
+                    <div class="relative pl-4">
+                      <span class="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full border-2 border-card bg-primary"></span>
+                      <p class="text-sm font-medium">李明 提交审批</p>
+                      <p class="text-xs text-muted-foreground">2026-08-14 10:23</p>
+                    </div>
+                    <div class="relative pl-4">
+                      <span class="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full border-2 border-card bg-primary"></span>
+                      <p class="text-sm font-medium">Scheduler-Agent 完成 AI 分析</p>
+                      <p class="text-xs text-muted-foreground">2026-08-14 10:24 · 风险评级：中</p>
+                    </div>
+                    <div class="relative pl-4">
+                      <span class="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full border-2 border-primary bg-card"></span>
+                      <p class="text-sm font-medium text-foreground">待计划员审批</p>
+                      <p class="text-xs text-muted-foreground">当前节点</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action bar -->
+          <div class="action-bar border-t border-border bg-muted/30 p-4">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                <i data-lucide="alert-circle" class="h-4 w-4 text-warning"></i>
+                该审批需双签，通过后仍需计划主管复核
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button class="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted">
+                  <i data-lucide="user-plus" class="h-4 w-4"></i>
+                  加签
+                </button>
+                <button class="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted">
+                  <i data-lucide="forward" class="h-4 w-4"></i>
+                  转交
+                </button>
+                <button class="inline-flex items-center gap-1.5 rounded-md border border-error/30 bg-card px-4 py-2 text-sm font-medium text-error hover:bg-error/5">
+                  <i data-lucide="x-circle" class="h-4 w-4"></i>
+                  驳回
+                </button>
+                <button class="inline-flex items-center gap-1.5 rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                  <i data-lucide="check-circle" class="h-4 w-4"></i>
+                  通过
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>lucide.createIcons();</script>
+
+    <style id="critical-layout">
+      .cm-approval-layout {
+        display: flex;
+        gap: var(--cm-s-5);
+        min-width: 0;
+        width: 100%;
+      }
+      .cm-approval-list {
+        flex: 0 0 45%;
+        min-width: 360px;
+        max-width: 520px;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      .cm-approval-detail {
+        flex: 1 1 55%;
+        min-width: 420px;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      @media (max-width: 1024px) {
+        .cm-approval-layout { flex-direction: column; }
+        .cm-approval-list,
+        .cm-approval-detail { flex: 1 1 auto; max-width: none; min-width: 0; }
+      }
+    </style>
+    <style id="state-token-fallback">
+      .text-success { color: var(--cm-state-success); }
+      .bg-success { background-color: var(--cm-state-success); }
+      .bg-success\/10 { background-color: rgba(16, 185, 129, 0.1); }
+      .border-success { border-color: var(--cm-state-success); }
+      .text-warning { color: var(--cm-state-warning); }
+      .bg-warning { background-color: var(--cm-state-warning); }
+      .bg-warning\/10 { background-color: rgba(245, 158, 11, 0.1); }
+      .border-warning { border-color: var(--cm-state-warning); }
+      .text-error { color: var(--cm-state-error); }
+      .bg-error { background-color: var(--cm-state-error); }
+      .bg-error\/5 { background-color: rgba(239, 68, 68, 0.05); }
+      .bg-error\/10 { background-color: rgba(239, 68, 68, 0.1); }
+      .border-error { border-color: var(--cm-state-error); }
+      .border-error\/30 { border-color: rgba(239, 68, 68, 0.3); }
+      .text-info { color: var(--cm-state-info); }
+      .bg-info { background-color: var(--cm-state-info); }
+      .bg-info\/10 { background-color: rgba(6, 182, 212, 0.1); }
+      .border-info { border-color: var(--cm-state-info); }
+    </style>
+</body>
+</html>

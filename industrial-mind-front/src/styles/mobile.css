@@ -1,0 +1,45 @@
+/** 移动端页面共享样式（header / 通用小组件） */
+
+.m-header {
+  position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 420px; height: 56px; z-index: 90;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--cm-border);
+}
+
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-logo {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--cm-primary-500), var(--cm-primary-700));
+  color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.brand-name { font-size: 15px; font-weight: 600; color: var(--cm-slate-800); letter-spacing: -0.01em; }
+
+.header-actions { display: flex; align-items: center; gap: 10px; }
+.icon-btn {
+  position: relative; width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--cm-border); background: var(--cm-card);
+  color: var(--cm-slate-500); display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--cm-primary-100); color: var(--cm-primary-700);
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.sec-title { font-size: 12px; font-weight: 600; color: var(--cm-slate-500); margin-bottom: 8px; }
+
+/* 通用徽标 */
+.m-badge { font-size: 11px; padding: 2px 8px; border-radius: 9999px; font-weight: 500; white-space: nowrap; }
+.m-badge.primary { background: var(--cm-primary-50); color: var(--cm-primary-700); }
+.m-badge.error { background: var(--cm-state-error-bg); color: #b91c1c; }
+.m-badge.warning { background: var(--cm-state-warning-bg); color: #b45309; }
+.m-badge.success { background: var(--cm-state-success-bg); color: #047857; }
+.m-badge.info { background: var(--cm-state-info-bg); color: var(--cm-primary-700); }
+.m-badge.muted { background: var(--cm-slate-100); color: var(--cm-slate-500); }

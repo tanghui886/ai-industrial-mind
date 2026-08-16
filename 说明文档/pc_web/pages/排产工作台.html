@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排产工作台</title>
+    <style id="theme-vars">
+:root {
+  /* Brand primary scale — industrial tech cyan */
+  --cm-primary-50: #ecfeff;
+  --cm-primary-100: #cffafe;
+  --cm-primary-200: #a5f3fc;
+  --cm-primary-300: #67e8f9;
+  --cm-primary-400: #22d3ee;
+  --cm-primary-500: #06b6d4;
+  --cm-primary-600: #0891b2;
+  --cm-primary-700: #0e7490;
+  --cm-primary-800: #155e75;
+  --cm-primary-900: #164e63;
+
+  /* Neutral slate scale */
+  --cm-slate-50: #f8fafc;
+  --cm-slate-100: #f1f5f9;
+  --cm-slate-200: #e2e8f0;
+  --cm-slate-300: #cbd5e1;
+  --cm-slate-400: #94a3b8;
+  --cm-slate-500: #64748b;
+  --cm-slate-600: #475569;
+  --cm-slate-700: #334155;
+  --cm-slate-800: #1e293b;
+  --cm-slate-900: #0f172a;
+
+  /* Semantic tokens */
+  --cm-background: var(--cm-slate-50);
+  --cm-foreground: var(--cm-slate-900);
+  --cm-card: #ffffff;
+  --cm-card-foreground: var(--cm-slate-900);
+  --cm-popover: #ffffff;
+  --cm-popover-foreground: var(--cm-slate-900);
+  --cm-primary: var(--cm-primary-600);
+  --cm-primary-foreground: #ffffff;
+  --cm-muted: var(--cm-slate-100);
+  --cm-muted-foreground: var(--cm-slate-500);
+  --cm-border: var(--cm-slate-200);
+  --cm-input: var(--cm-slate-200);
+  --cm-ring: var(--cm-primary-400);
+
+  /* State tokens */
+  --cm-state-success: #10b981;
+  --cm-state-success-bg: #d1fae5;
+  --cm-state-warning: #f59e0b;
+  --cm-state-warning-bg: #fef3c7;
+  --cm-state-error: #ef4444;
+  --cm-state-error-bg: #fee2e2;
+  --cm-state-info: var(--cm-primary-500);
+  --cm-state-info-bg: var(--cm-primary-50);
+
+  /* Radius */
+  --cm-radius-small: 4px;
+  --cm-radius-medium: 8px;
+  --cm-radius-large: 12px;
+  --cm-radius-full: 9999px;
+
+  /* Shadows */
+  --cm-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --cm-shadow-2: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+  --cm-shadow-3: 0 24px 60px -20px rgba(15, 23, 42, 0.22);
+
+  /* Typography */
+  --cm-font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --cm-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* Spacing scale */
+  --cm-s-1: 4px;
+  --cm-s-2: 8px;
+  --cm-s-3: 12px;
+  --cm-s-4: 16px;
+  --cm-s-5: 24px;
+  --cm-s-6: 32px;
+  --cm-s-7: 48px;
+  --cm-s-8: 64px;
+}
+
+html.dark {
+  --cm-background: #0b0f19;
+  --cm-foreground: #f1f5f9;
+  --cm-card: #111827;
+  --cm-card-foreground: #f1f5f9;
+  --cm-popover: #111827;
+  --cm-popover-foreground: #f1f5f9;
+  --cm-muted: #1e293b;
+  --cm-muted-foreground: #94a3b8;
+  --cm-border: #1e293b;
+  --cm-input: #1e293b;
+}
+
+body {
+  font-family: var(--cm-font-sans);
+  background-color: var(--cm-background);
+  color: var(--cm-foreground);
+}
+
+.cm-heading {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.cm-kpi-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cm-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--cm-background);
+    --color-foreground: var(--cm-foreground);
+    --color-card: var(--cm-card);
+    --color-card-foreground: var(--cm-card-foreground);
+    --color-popover: var(--cm-popover);
+    --color-popover-foreground: var(--cm-popover-foreground);
+    --color-primary: var(--cm-primary);
+    --color-primary-foreground: var(--cm-primary-foreground);
+    --color-muted: var(--cm-muted);
+    --color-muted-foreground: var(--cm-muted-foreground);
+    --color-border: var(--cm-border);
+    --color-input: var(--cm-input);
+    --color-ring: var(--cm-ring);
+    --radius-sm: var(--cm-radius-small);
+    --radius-md: var(--cm-radius-medium);
+    --radius-lg: var(--cm-radius-large);
+  }
+  @layer base {
+    body { background: var(--cm-background); color: var(--cm-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--cm-background); }
+      .text-background { color: var(--cm-background); }
+      .border-background { border-color: var(--cm-background); }
+      .ring-background { --tw-ring-color: var(--cm-background); }
+      .bg-foreground { background-color: var(--cm-foreground); }
+      .text-foreground { color: var(--cm-foreground); }
+      .border-foreground { border-color: var(--cm-foreground); }
+      .ring-foreground { --tw-ring-color: var(--cm-foreground); }
+      .bg-card { background-color: var(--cm-card); }
+      .text-card { color: var(--cm-card); }
+      .border-card { border-color: var(--cm-card); }
+      .ring-card { --tw-ring-color: var(--cm-card); }
+      .bg-card-foreground { background-color: var(--cm-card-foreground); }
+      .text-card-foreground { color: var(--cm-card-foreground); }
+      .border-card-foreground { border-color: var(--cm-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--cm-card-foreground); }
+      .bg-popover { background-color: var(--cm-popover); }
+      .text-popover { color: var(--cm-popover); }
+      .border-popover { border-color: var(--cm-popover); }
+      .ring-popover { --tw-ring-color: var(--cm-popover); }
+      .bg-popover-foreground { background-color: var(--cm-popover-foreground); }
+      .text-popover-foreground { color: var(--cm-popover-foreground); }
+      .border-popover-foreground { border-color: var(--cm-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--cm-popover-foreground); }
+      .bg-primary { background-color: var(--cm-primary); }
+      .text-primary { color: var(--cm-primary); }
+      .border-primary { border-color: var(--cm-primary); }
+      .ring-primary { --tw-ring-color: var(--cm-primary); }
+      .bg-primary-foreground { background-color: var(--cm-primary-foreground); }
+      .text-primary-foreground { color: var(--cm-primary-foreground); }
+      .border-primary-foreground { border-color: var(--cm-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--cm-primary-foreground); }
+      .bg-muted { background-color: var(--cm-muted); }
+      .text-muted { color: var(--cm-muted); }
+      .border-muted { border-color: var(--cm-muted); }
+      .ring-muted { --tw-ring-color: var(--cm-muted); }
+      .bg-muted-foreground { background-color: var(--cm-muted-foreground); }
+      .text-muted-foreground { color: var(--cm-muted-foreground); }
+      .border-muted-foreground { border-color: var(--cm-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--cm-muted-foreground); }
+      .bg-border { background-color: var(--cm-border); }
+      .text-border { color: var(--cm-border); }
+      .border-border { border-color: var(--cm-border); }
+      .ring-border { --tw-ring-color: var(--cm-border); }
+      .bg-input { background-color: var(--cm-input); }
+      .text-input { color: var(--cm-input); }
+      .border-input { border-color: var(--cm-input); }
+      .ring-input { --tw-ring-color: var(--cm-input); }
+      .bg-ring { background-color: var(--cm-ring); }
+      .text-ring { color: var(--cm-ring); }
+      .border-ring { border-color: var(--cm-ring); }
+      .ring-ring { --tw-ring-color: var(--cm-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <div id="page-planning-workbench" class="flex flex-col min-h-screen">
+      <!-- Top app bar -->
+      <header class="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur">
+        <div class="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-4 lg:px-6">
+          <div class="flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <i data-lucide="container" class="h-5 w-5"></i>
+            </div>
+            <span class="cm-heading text-lg">ContainerMind</span>
+          </div>
+          <nav class="hidden items-center gap-1 md:flex">
+            <a id="nav-dashboard" data-dom-id="nav-dashboard" href="dashboard.html" class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+              <i data-lucide="layout-dashboard" class="h-4 w-4"></i> 产线总览
+            </a>
+            <a id="nav-agent-chat" data-dom-id="nav-agent-chat" href="agent-chat.html" class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+              <i data-lucide="message-square" class="h-4 w-4"></i> Agent 对话台
+            </a>
+            <a id="nav-approval" data-dom-id="nav-approval" href="approval.html" class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+              <i data-lucide="check-circle" class="h-4 w-4"></i> 审批工作台
+            </a>
+          </nav>
+          <div class="flex items-center gap-3">
+            <button class="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted">
+              <i data-lucide="bell" class="h-4 w-4"></i>
+            </button>
+            <div class="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold text-slate-700">PM</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 px-4 py-5 lg:px-6">
+        <div class="mx-auto max-w-[1600px] space-y-5">
+          <!-- Control toolbar -->
+          <section class="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-[var(--cm-shadow-1)] lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2">
+                <i data-lucide="calendar-days" class="h-4 w-4 text-muted-foreground"></i>
+                <span class="text-sm font-medium">2026年8月</span>
+                <i data-lucide="chevron-down" class="h-4 w-4 text-muted-foreground"></i>
+              </div>
+              <div class="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2">
+                <i data-lucide="factory" class="h-4 w-4 text-muted-foreground"></i>
+                <span class="text-sm font-medium">QD-D 特箱线</span>
+                <i data-lucide="chevron-down" class="h-4 w-4 text-muted-foreground"></i>
+              </div>
+              <div class="inline-flex rounded-md border border-border bg-background p-1">
+                <button class="rounded px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground">日历</button>
+                <button class="rounded px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted">甘特</button>
+                <button class="rounded px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted">表格</button>
+              </div>
+            </div>
+            <button id="btn-smart-plan" class="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--cm-shadow-1)] hover:bg-[var(--cm-primary-700)] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+              <i data-lucide="sparkles" class="h-4 w-4"></i> 智能排产
+            </button>
+          </section>
+
+          <!-- Summary cards -->
+          <section class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+            <div class="rounded-xl border border-border bg-card p-4 shadow-[var(--cm-shadow-1)]">
+              <p class="text-xs text-muted-foreground">本月计划 TEU</p>
+              <p class="cm-kpi-value mt-1 text-2xl text-foreground">2,460</p>
+            </div>
+            <div class="rounded-xl border border-border bg-card p-4 shadow-[var(--cm-shadow-1)]">
+              <p class="text-xs text-muted-foreground">已排 TEU</p>
+              <p class="cm-kpi-value mt-1 text-2xl text-foreground">1,842</p>
+            </div>
+            <div class="rounded-xl border border-border bg-card p-4 shadow-[var(--cm-shadow-1)]">
+              <p class="text-xs text-muted-foreground">剩余空位</p>
+              <p class="cm-kpi-value mt-1 text-2xl text-[var(--cm-state-success)]">618</p>
+            </div>
+            <div class="rounded-xl border border-border bg-card p-4 shadow-[var(--cm-shadow-1)]">
+              <p class="text-xs text-muted-foreground">冲突数量</p>
+              <p class="cm-kpi-value mt-1 text-2xl text-[var(--cm-state-error)]">3</p>
+            </div>
+            <div class="rounded-xl border border-border bg-card p-4 shadow-[var(--cm-shadow-1)] col-span-2 md:col-span-1">
+              <p class="text-xs text-muted-foreground">待审批变更</p>
+              <p class="cm-kpi-value mt-1 text-2xl text-[var(--cm-state-warning)]">5</p>
+            </div>
+          </section>
+
+          <!-- AI assist bar -->
+          <section class="flex flex-col gap-3 rounded-lg border border-[var(--cm-primary-200)] bg-[var(--cm-primary-50)] p-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <i data-lucide="sparkles" class="h-3.5 w-3.5"></i>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-foreground">AI 建议</p>
+                <p class="text-sm text-muted-foreground">将 <span class="font-mono font-medium text-foreground">DFQD-2026-285-DS</span> 提前 2 天以避开物料缺口</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-[var(--cm-primary-700)]">应用</button>
+              <button class="inline-flex items-center gap-1.5 rounded-md border border-[var(--cm-primary-200)] bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted">忽略</button>
+            </div>
+          </section>
+
+          <!-- Monthly calendar -->
+          <section class="rounded-xl border border-border bg-card p-4 shadow-[var(--cm-shadow-1)]">
+            <div class="mb-4 flex items-center justify-between">
+              <h2 class="cm-heading text-base">2026年8月 产能日历</h2>
+              <div class="flex items-center gap-4 text-xs text-muted-foreground">
+                <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-primary"></span>正常</span>
+                <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-[var(--cm-state-warning)]"></span>紧张</span>
+                <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-[var(--cm-state-error)]"></span>冲突</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-7 gap-1 bg-border rounded-md overflow-hidden mb-1">
+              <div class="bg-muted py-2 text-center text-xs font-medium text-muted-foreground">日</div>
+              <div class="bg-muted py-2 text-center text-xs font-medium text-muted-foreground">一</div>
+              <div class="bg-muted py-2 text-center text-xs font-medium text-muted-foreground">二</div>
+              <div class="bg-muted py-2 text-center text-xs font-medium text-muted-foreground">三</div>
+              <div class="bg-muted py-2 text-center text-xs font-medium text-muted-foreground">四</div>
+              <div class="bg-muted py-2 text-center text-xs font-medium text-muted-foreground">五</div>
+              <div class="bg-muted py-2 text-center text-xs font-medium text-muted-foreground">六</div>
+            </div>
+            <div class="cm-calendar-grid">
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">26</span></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">27</span></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">28</span></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">29</span></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">30</span></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">31</span></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">1</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 78%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">2</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 82%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">3</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 70%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">4</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 85%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">5</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-[var(--cm-state-warning)]" style="width: 95%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">6</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-[var(--cm-state-error)]" style="width: 100%"></div></div><div class="mt-1 flex items-center gap-1"><span class="h-1.5 w-1.5 rounded-full bg-[var(--cm-state-error)]"></span><span class="text-[10px] text-[var(--cm-state-error)]">冲突</span></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">7</span><div class="mt-2 text-xs text-muted-foreground">0h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-slate-300" style="width: 0%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">8</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 68%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">9</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 74%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">10</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 80%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">11</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 72%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">12</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-[var(--cm-state-warning)]" style="width: 92%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">13</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 88%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">14</span><div class="mt-2 text-xs text-muted-foreground">0h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-slate-300" style="width: 0%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">15</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 76%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">16</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 65%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">17</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 71%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">18</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 84%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">19</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-[var(--cm-state-warning)]" style="width: 96%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">20</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-[var(--cm-state-error)]" style="width: 100%"></div></div><div class="mt-1 flex items-center gap-1"><span class="h-1.5 w-1.5 rounded-full bg-[var(--cm-state-error)]"></span><span class="text-[10px] text-[var(--cm-state-error)]">冲突</span></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">21</span><div class="mt-2 text-xs text-muted-foreground">0h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-slate-300" style="width: 0%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">22</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 69%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">23</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 73%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">24</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 81%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">25</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 77%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">26</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-[var(--cm-state-warning)]" style="width: 94%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">27</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 86%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">28</span><div class="mt-2 text-xs text-muted-foreground">0h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-slate-300" style="width: 0%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">29</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 75%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">30</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-primary" style="width: 79%"></div></div></div>
+              <div class="cm-calendar-cell p-2"><span class="text-xs font-semibold">31</span><div class="mt-2 text-xs text-muted-foreground">11h</div><div class="mt-1 h-1.5 w-full rounded-full bg-slate-100"><div class="h-1.5 rounded-full bg-[var(--cm-state-error)]" style="width: 100%"></div></div><div class="mt-1 flex items-center gap-1"><span class="h-1.5 w-1.5 rounded-full bg-[var(--cm-state-error)]"></span><span class="text-[10px] text-[var(--cm-state-error)]">冲突</span></div></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">1</span></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">2</span></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">3</span></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">4</span></div>
+              <div class="cm-calendar-cell muted p-2"><span class="text-xs text-muted-foreground">5</span></div>
+            </div>
+          </section>
+
+          <!-- Mini Gantt -->
+          <section class="rounded-xl border border-border bg-card p-4 shadow-[var(--cm-shadow-1)]">
+            <div class="mb-4 flex items-center justify-between">
+              <h2 class="cm-heading text-base">工令甘特</h2>
+              <span class="text-xs text-muted-foreground">8月1日 — 8月31日</span>
+            </div>
+            <div class="cm-gantt-wrap">
+              <div id="gantt-chart" class="h-64 w-full"></div>
+            </div>
+          </section>
+
+          <!-- Work order table -->
+          <section class="rounded-xl border border-border bg-card p-4 shadow-[var(--cm-shadow-1)]">
+            <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <h2 class="cm-heading text-base">工令明细</h2>
+              <button class="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm font-medium hover:bg-muted">
+                <i data-lucide="plus" class="h-4 w-4"></i> 添加工令
+              </button>
+            </div>
+            <div class="cm-scroll-x rounded-md border border-border">
+              <table class="cm-wo-table">
+                <thead>
+                  <tr>
+                    <th>产线</th>
+                    <th>工令号</th>
+                    <th>客户</th>
+                    <th>箱型</th>
+                    <th class="cm-tabular">数量</th>
+                    <th class="cm-tabular">TEU</th>
+                    <th class="cm-tabular">开始日期</th>
+                    <th class="cm-tabular">结束日期</th>
+                    <th class="cm-tabular">日计划排产量</th>
+                    <th class="cm-tabular">日产能</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>QD-D 特箱线</td>
+                    <td class="font-mono text-sm">DFQD-2026-281-DS</td>
+                    <td>中远海运</td>
+                    <td>40HC</td>
+                    <td class="cm-tabular">120</td>
+                    <td class="cm-tabular">240</td>
+                    <td class="cm-tabular">2026-08-03</td>
+                    <td class="cm-tabular">2026-08-12</td>
+                    <td class="cm-tabular">12</td>
+                    <td class="cm-tabular">14</td>
+                    <td><span class="inline-flex items-center rounded-full bg-[var(--cm-state-success-bg)] px-2 py-0.5 text-xs font-medium text-[var(--cm-state-success)]">已确认</span></td>
+                    <td>
+                      <div class="flex items-center gap-2">
+                        <button class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"><i data-lucide="pencil" class="h-3.5 w-3.5"></i></button>
+                        <button class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"><i data-lucide="trash-2" class="h-3.5 w-3.5"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>QD-D 特箱线</td>
+                    <td class="font-mono text-sm">DFQD-2026-282-DS</td>
+                    <td>马士基</td>
+                    <td>Ener C+</td>
+                    <td class="cm-tabular">80</td>
+                    <td class="cm-tabular">160</td>
+                    <td class="cm-tabular">2026-08-08</td>
+                    <td class="cm-tabular">2026-08-17</td>
+                    <td class="cm-tabular">9</td>
+                    <td class="cm-tabular">10</td>
+                    <td><span class="inline-flex items-center rounded-full bg-[var(--cm-state-info-bg)] px-2 py-0.5 text-xs font-medium text-[var(--cm-state-info)]">草稿</span></td>
+                    <td>
+                      <div class="flex items-center gap-2">
+                        <button class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"><i data-lucide="pencil" class="h-3.5 w-3.5"></i></button>
+                        <button class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"><i data-lucide="trash-2" class="h-3.5 w-3.5"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>QD-D 特箱线</td>
+                    <td class="font-mono text-sm">DFQD-2026-283-DS</td>
+                    <td>MSC</td>
+                    <td>20GP</td>
+                    <td class="cm-tabular">200</td>
+                    <td class="cm-tabular">200</td>
+                    <td class="cm-tabular">2026-08-15</td>
+                    <td class="cm-tabular">2026-08-24</td>
+                    <td class="cm-tabular">20</td>
+                    <td class="cm-tabular">22</td>
+                    <td><span class="inline-flex items-center rounded-full bg-[var(--cm-state-warning-bg)] px-2 py-0.5 text-xs font-medium text-[var(--cm-state-warning)]">待审批</span></td>
+                    <td>
+                      <div class="flex items-center gap-2">
+                        <button class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"><i data-lucide="pencil" class="h-3.5 w-3.5"></i></button>
+                        <button class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"><i data-lucide="trash-2" class="h-3.5 w-3.5"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>QD-D 特箱线</td>
+                    <td class="font-mono text-sm">DFQD-2026-284-DS</td>
+                    <td>达飞轮船</td>
+                    <td>40HC</td>
+                    <td class="cm-tabular">150</td>
+                    <td class="cm-tabular">300</td>
+                    <td class="cm-tabular">2026-08-20</td>
+                    <td class="cm-tabular">2026-08-28</td>
+                    <td class="cm-tabular">17</td>
+                    <td class="cm-tabular">18</td>
+                    <td><span class="inline-flex items-center rounded-full bg-[var(--cm-state-info-bg)] px-2 py-0.5 text-xs font-medium text-[var(--cm-state-info)]">草稿</span></td>
+                    <td>
+                      <div class="flex items-center gap-2">
+                        <button class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"><i data-lucide="pencil" class="h-3.5 w-3.5"></i></button>
+                        <button class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"><i data-lucide="trash-2" class="h-3.5 w-3.5"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script>
+      (function () {
+        var chartDom = document.getElementById('gantt-chart');
+        if (!chartDom || typeof echarts === 'undefined') return;
+        var myChart = echarts.init(chartDom);
+        var categories = ['DFQD-2026-281-DS', 'DFQD-2026-282-DS', 'DFQD-2026-283-DS'];
+        var data = [
+          { name: 'DFQD-2026-281-DS', value: [0, new Date('2026-08-03').getTime(), new Date('2026-08-13').getTime()], itemStyle: { color: 'var(--cm-primary-500)' } },
+          { name: 'DFQD-2026-282-DS', value: [1, new Date('2026-08-08').getTime(), new Date('2026-08-18').getTime()], itemStyle: { color: 'var(--cm-primary-600)' } },
+          { name: 'DFQD-2026-283-DS', value: [2, new Date('2026-08-15').getTime(), new Date('2026-08-25').getTime()], itemStyle: { color: 'var(--cm-primary-400)' } }
+        ];
+        var option = {
+          tooltip: {
+            formatter: function (params) {
+              var v = params.value;
+              var start = new Date(v[1]);
+              var end = new Date(v[2]);
+              var fmt = function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+              return '<div class="text-sm font-medium">' + params.name + '</div><div class="text-xs text-muted-foreground">' + fmt(start) + ' 至 ' + fmt(end) + '</div>';
+            }
+          },
+          grid: { left: '148px', right: '24px', top: '12px', bottom: '24px' },
+          xAxis: {
+            type: 'time',
+            min: new Date('2026-08-01').getTime(),
+            max: new Date('2026-09-01').getTime(),
+            axisLabel: { formatter: '{MM}-{dd}', color: 'var(--cm-slate-500)' },
+            splitLine: { lineStyle: { color: 'var(--cm-slate-200)' } }
+          },
+          yAxis: {
+            type: 'category',
+            data: categories,
+            axisLabel: { color: 'var(--cm-slate-700)', fontFamily: 'var(--cm-font-mono)' },
+            splitLine: { show: true, lineStyle: { color: 'var(--cm-slate-200)' } }
+          },
+          series: [{
+            type: 'custom',
+            renderItem: function (params, api) {
+              var categoryIndex = api.value(0);
+              var start = api.coord([api.value(1), categoryIndex]);
+              var end = api.coord([api.value(2), categoryIndex]);
+              var height = api.size([0, 1])[1] * 0.5;
+              var rectShape = echarts.graphic.clipRectByRect({
+                x: start[0], y: start[1] - height / 2, width: end[0] - start[0], height: height
+              }, { x: params.coordSys.x, y: params.coordSys.y, width: params.coordSys.width, height: params.coordSys.height });
+              return rectShape && {
+                type: 'rect',
+                transition: ['shape'],
+                shape: rectShape,
+                style: api.style()
+              };
+            },
+            encode: { x: [1, 2], y: 0 },
+            data: data
+          }]
+        };
+        myChart.setOption(option);
+        window.addEventListener('resize', function () { myChart.resize(); });
+      })();
+    </script>
+    <script>lucide.createIcons();</script>
+
+    <style id="critical-layout">
+      .cm-calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 1px;
+        background-color: var(--cm-border);
+        border: 1px solid var(--cm-border);
+        border-radius: var(--cm-radius-medium);
+        overflow: hidden;
+      }
+      .cm-calendar-cell {
+        min-height: 96px;
+        background-color: var(--cm-card);
+      }
+      .cm-calendar-cell.muted {
+        background-color: var(--cm-slate-100);
+      }
+      .cm-gantt-wrap {
+        width: 100%;
+        min-height: 240px;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+      .cm-gantt-wrap > div {
+        min-width: 720px;
+      }
+      .cm-wo-table {
+        width: 100%;
+        min-width: 960px;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+      .cm-wo-table th,
+      .cm-wo-table td {
+        border-bottom: 1px solid var(--cm-border);
+        padding: var(--cm-s-3) var(--cm-s-4);
+        text-align: left;
+        vertical-align: middle;
+      }
+      .cm-wo-table thead th {
+        background-color: var(--cm-slate-50);
+        font-weight: 600;
+      }
+      .cm-wo-table tbody tr:hover td {
+        background-color: var(--cm-slate-50);
+      }
+      .cm-scroll-x {
+        overflow-x: auto;
+        max-width: 100%;
+      }
+    </style>
+</body>
+</html>

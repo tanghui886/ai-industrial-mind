@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排产查看</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+:root {
+  /* Brand primary scale — industrial tech cyan */
+  --cm-primary-50: #ecfeff;
+  --cm-primary-100: #cffafe;
+  --cm-primary-200: #a5f3fc;
+  --cm-primary-300: #67e8f9;
+  --cm-primary-400: #22d3ee;
+  --cm-primary-500: #06b6d4;
+  --cm-primary-600: #0891b2;
+  --cm-primary-700: #0e7490;
+  --cm-primary-800: #155e75;
+  --cm-primary-900: #164e63;
+
+  /* Neutral slate scale */
+  --cm-slate-50: #f8fafc;
+  --cm-slate-100: #f1f5f9;
+  --cm-slate-200: #e2e8f0;
+  --cm-slate-300: #cbd5e1;
+  --cm-slate-400: #94a3b8;
+  --cm-slate-500: #64748b;
+  --cm-slate-600: #475569;
+  --cm-slate-700: #334155;
+  --cm-slate-800: #1e293b;
+  --cm-slate-900: #0f172a;
+
+  /* Semantic tokens */
+  --cm-background: var(--cm-slate-50);
+  --cm-foreground: var(--cm-slate-900);
+  --cm-card: #ffffff;
+  --cm-card-foreground: var(--cm-slate-900);
+  --cm-popover: #ffffff;
+  --cm-popover-foreground: var(--cm-slate-900);
+  --cm-primary: var(--cm-primary-600);
+  --cm-primary-foreground: #ffffff;
+  --cm-muted: var(--cm-slate-100);
+  --cm-muted-foreground: var(--cm-slate-500);
+  --cm-border: var(--cm-slate-200);
+  --cm-input: var(--cm-slate-200);
+  --cm-ring: var(--cm-primary-400);
+
+  /* State tokens */
+  --cm-state-success: #10b981;
+  --cm-state-success-bg: #d1fae5;
+  --cm-state-warning: #f59e0b;
+  --cm-state-warning-bg: #fef3c7;
+  --cm-state-error: #ef4444;
+  --cm-state-error-bg: #fee2e2;
+  --cm-state-info: var(--cm-primary-500);
+  --cm-state-info-bg: var(--cm-primary-50);
+
+  /* Radius */
+  --cm-radius-small: 4px;
+  --cm-radius-medium: 8px;
+  --cm-radius-large: 12px;
+  --cm-radius-full: 9999px;
+
+  /* Shadows */
+  --cm-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --cm-shadow-2: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+  --cm-shadow-3: 0 24px 60px -20px rgba(15, 23, 42, 0.22);
+
+  /* Typography */
+  --cm-font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --cm-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* Spacing scale */
+  --cm-s-1: 4px;
+  --cm-s-2: 8px;
+  --cm-s-3: 12px;
+  --cm-s-4: 16px;
+  --cm-s-5: 24px;
+  --cm-s-6: 32px;
+  --cm-s-7: 48px;
+  --cm-s-8: 64px;
+}
+
+html.dark {
+  --cm-background: #0b0f19;
+  --cm-foreground: #f1f5f9;
+  --cm-card: #111827;
+  --cm-card-foreground: #f1f5f9;
+  --cm-popover: #111827;
+  --cm-popover-foreground: #f1f5f9;
+  --cm-muted: #1e293b;
+  --cm-muted-foreground: #94a3b8;
+  --cm-border: #1e293b;
+  --cm-input: #1e293b;
+}
+
+body {
+  font-family: var(--cm-font-sans);
+  background-color: var(--cm-background);
+  color: var(--cm-foreground);
+}
+
+.cm-heading {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.cm-kpi-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cm-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--cm-background);
+    --color-foreground: var(--cm-foreground);
+    --color-card: var(--cm-card);
+    --color-card-foreground: var(--cm-card-foreground);
+    --color-popover: var(--cm-popover);
+    --color-popover-foreground: var(--cm-popover-foreground);
+    --color-primary: var(--cm-primary);
+    --color-primary-foreground: var(--cm-primary-foreground);
+    --color-muted: var(--cm-muted);
+    --color-muted-foreground: var(--cm-muted-foreground);
+    --color-border: var(--cm-border);
+    --color-input: var(--cm-input);
+    --color-ring: var(--cm-ring);
+    --radius-sm: var(--cm-radius-small);
+    --radius-md: var(--cm-radius-medium);
+    --radius-lg: var(--cm-radius-large);
+    --radius-xl: var(--cm-radius-large);
+  }
+  @layer base {
+    body { background: var(--cm-background); color: var(--cm-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--cm-background); }
+      .text-background { color: var(--cm-background); }
+      .border-background { border-color: var(--cm-background); }
+      .ring-background { --tw-ring-color: var(--cm-background); }
+      .bg-foreground { background-color: var(--cm-foreground); }
+      .text-foreground { color: var(--cm-foreground); }
+      .border-foreground { border-color: var(--cm-foreground); }
+      .ring-foreground { --tw-ring-color: var(--cm-foreground); }
+      .bg-card { background-color: var(--cm-card); }
+      .text-card { color: var(--cm-card); }
+      .border-card { border-color: var(--cm-card); }
+      .ring-card { --tw-ring-color: var(--cm-card); }
+      .bg-card-foreground { background-color: var(--cm-card-foreground); }
+      .text-card-foreground { color: var(--cm-card-foreground); }
+      .border-card-foreground { border-color: var(--cm-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--cm-card-foreground); }
+      .bg-popover { background-color: var(--cm-popover); }
+      .text-popover { color: var(--cm-popover); }
+      .border-popover { border-color: var(--cm-popover); }
+      .ring-popover { --tw-ring-color: var(--cm-popover); }
+      .bg-popover-foreground { background-color: var(--cm-popover-foreground); }
+      .text-popover-foreground { color: var(--cm-popover-foreground); }
+      .border-popover-foreground { border-color: var(--cm-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--cm-popover-foreground); }
+      .bg-primary { background-color: var(--cm-primary); }
+      .text-primary { color: var(--cm-primary); }
+      .border-primary { border-color: var(--cm-primary); }
+      .ring-primary { --tw-ring-color: var(--cm-primary); }
+      .bg-primary-foreground { background-color: var(--cm-primary-foreground); }
+      .text-primary-foreground { color: var(--cm-primary-foreground); }
+      .border-primary-foreground { border-color: var(--cm-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--cm-primary-foreground); }
+      .bg-muted { background-color: var(--cm-muted); }
+      .text-muted { color: var(--cm-muted); }
+      .border-muted { border-color: var(--cm-muted); }
+      .ring-muted { --tw-ring-color: var(--cm-muted); }
+      .bg-muted-foreground { background-color: var(--cm-muted-foreground); }
+      .text-muted-foreground { color: var(--cm-muted-foreground); }
+      .border-muted-foreground { border-color: var(--cm-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--cm-muted-foreground); }
+      .bg-border { background-color: var(--cm-border); }
+      .text-border { color: var(--cm-border); }
+      .border-border { border-color: var(--cm-border); }
+      .ring-border { --tw-ring-color: var(--cm-border); }
+      .bg-input { background-color: var(--cm-input); }
+      .text-input { color: var(--cm-input); }
+      .border-input { border-color: var(--cm-input); }
+      .ring-input { --tw-ring-color: var(--cm-input); }
+      .bg-ring { background-color: var(--cm-ring); }
+      .text-ring { color: var(--cm-ring); }
+      .border-ring { border-color: var(--cm-ring); }
+      .ring-ring { --tw-ring-color: var(--cm-ring); }
+      .bg-warning { background-color: var(--cm-state-warning); }
+      .text-warning { color: var(--cm-state-warning); }
+      .bg-error { background-color: var(--cm-state-error); }
+      .text-error { color: var(--cm-state-error); }
+      .bg-slate-300 { background-color: var(--cm-slate-300); }
+      .hover\:bg-slate-200:hover { background-color: var(--cm-slate-200); }
+    </style>
+    <style id="critical-layout">
+      html, body { overflow-x: hidden; }
+      .cm-mobile-wrap {
+        max-width: 430px;
+        margin: 0 auto;
+        min-height: 100vh;
+        position: relative;
+        background-color: var(--cm-background);
+        overflow-x: hidden;
+      }
+      .cm-app-bar {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+      }
+      .cm-bottom-nav {
+        height: 56px;
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      .cm-main {
+        padding-bottom: calc(56px + env(safe-area-inset-bottom));
+      }
+      .cm-kpi-card { box-shadow: var(--cm-shadow-2); }
+      .cm-day-card { box-shadow: var(--cm-shadow-1); }
+      .cm-util-bar { transition: width 0.3s ease; }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <div class="cm-mobile-wrap">
+        <header class="cm-app-bar bg-card border-b border-border px-4 py-3 flex items-center justify-between" data-region="app-bar">
+            <div class="flex items-center gap-2 min-w-0">
+                <span class="text-primary font-bold text-lg tracking-tight">ContainerMind</span>
+                <h1 class="text-base font-semibold text-foreground truncate">排产查看</h1>
+            </div>
+            <button class="flex items-center gap-1 text-sm text-muted-foreground bg-muted hover:bg-slate-200 transition-colors px-2 py-1.5 rounded-md shrink-0" aria-label="切换工厂">
+                <i data-lucide="building-2" class="w-4 h-4"></i>
+                <span>启东 QD-D</span>
+                <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+            </button>
+        </header>
+
+        <main class="cm-main">
+            <section class="px-4 pt-3 pb-2 flex items-center justify-between" data-region="month-selector">
+                <button class="w-9 h-9 flex items-center justify-center rounded-full bg-card border border-border text-foreground active:bg-muted" aria-label="上个月">
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                </button>
+                <h2 class="text-lg font-semibold text-foreground cm-tabular">2026年8月</h2>
+                <button class="w-9 h-9 flex items-center justify-center rounded-full bg-card border border-border text-foreground active:bg-muted" aria-label="下个月">
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+            </section>
+
+            <section class="px-4 py-3" data-region="kpi-card">
+                <div class="cm-kpi-card bg-card rounded-xl p-4 border border-border">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-muted-foreground">本月计划 TEU</span>
+                            <span class="text-lg font-semibold text-foreground cm-tabular">2,400</span>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs text-muted-foreground">已排 TEU</span>
+                            <span class="text-lg font-semibold text-primary cm-tabular">1,728</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-baseline gap-1 mb-1">
+                                <span class="text-5xl font-bold text-primary cm-kpi-value">72</span>
+                                <span class="text-xl font-semibold text-primary">%</span>
+                            </div>
+                            <p class="text-xs text-muted-foreground">产能利用率</p>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="text-xs text-muted-foreground">剩余空位</span>
+                            <span class="text-base font-semibold text-foreground cm-tabular">672 TEU</span>
+                        </div>
+                    </div>
+                    <div class="w-full h-2 bg-muted rounded-full overflow-hidden">
+                        <div class="cm-util-bar h-full bg-primary rounded-full" style="width:72%"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="px-4 py-2" data-region="weekly-calendar" aria-label="本周概览">
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                    <button class="cm-day-card flex flex-col items-center gap-1.5 min-w-[64px] p-2 rounded-xl bg-card border border-border">
+                        <span class="text-xs text-muted-foreground">一</span>
+                        <span class="text-base font-semibold text-foreground cm-tabular">10</span>
+                        <div class="w-full h-1 bg-muted rounded-full overflow-hidden">
+                            <div class="h-full bg-primary rounded-full" style="width:65%"></div>
+                        </div>
+                    </button>
+                    <button class="cm-day-card flex flex-col items-center gap-1.5 min-w-[64px] p-2 rounded-xl bg-card border border-border">
+                        <span class="text-xs text-muted-foreground">二</span>
+                        <span class="text-base font-semibold text-foreground cm-tabular">11</span>
+                        <div class="w-full h-1 bg-muted rounded-full overflow-hidden">
+                            <div class="h-full bg-primary rounded-full" style="width:58%"></div>
+                        </div>
+                    </button>
+                    <button class="cm-day-card flex flex-col items-center gap-1.5 min-w-[64px] p-2 rounded-xl bg-primary text-primary-foreground border border-primary" aria-current="date">
+                        <span class="text-xs text-primary-foreground/80">三</span>
+                        <span class="text-base font-semibold cm-tabular">12</span>
+                        <div class="w-full h-1 bg-primary-foreground/30 rounded-full overflow-hidden">
+                            <div class="h-full bg-primary-foreground rounded-full" style="width:72%"></div>
+                        </div>
+                    </button>
+                    <button class="cm-day-card flex flex-col items-center gap-1.5 min-w-[64px] p-2 rounded-xl bg-card border border-border">
+                        <span class="text-xs text-muted-foreground">四</span>
+                        <span class="text-base font-semibold text-foreground cm-tabular">13</span>
+                        <div class="w-full h-1 bg-muted rounded-full overflow-hidden">
+                            <div class="h-full bg-primary rounded-full" style="width:48%"></div>
+                        </div>
+                    </button>
+                    <button class="cm-day-card flex flex-col items-center gap-1.5 min-w-[64px] p-2 rounded-xl bg-card border border-border">
+                        <span class="text-xs text-muted-foreground">五</span>
+                        <span class="text-base font-semibold text-foreground cm-tabular">14</span>
+                        <div class="w-full h-1 bg-muted rounded-full overflow-hidden">
+                            <div class="h-full bg-primary rounded-full" style="width:82%"></div>
+                        </div>
+                    </button>
+                    <button class="cm-day-card flex flex-col items-center gap-1.5 min-w-[64px] p-2 rounded-xl bg-card border border-border">
+                        <span class="text-xs text-muted-foreground">六</span>
+                        <span class="text-base font-semibold text-foreground cm-tabular">15</span>
+                        <div class="w-full h-1 bg-muted rounded-full overflow-hidden">
+                            <div class="h-full bg-primary rounded-full" style="width:30%"></div>
+                        </div>
+                    </button>
+                    <button class="cm-day-card flex flex-col items-center gap-1.5 min-w-[64px] p-2 rounded-xl bg-card border border-border">
+                        <span class="text-xs text-muted-foreground">日</span>
+                        <span class="text-base font-semibold text-foreground cm-tabular">16</span>
+                        <div class="w-full h-1 bg-muted rounded-full overflow-hidden">
+                            <div class="h-full bg-primary rounded-full" style="width:20%"></div>
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+            <section class="px-4 py-3" data-region="date-list" aria-label="日期列表">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-semibold text-foreground">8月排产日历</h3>
+                    <span class="text-xs text-muted-foreground">计划工时默认 11h</span>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">1</span>
+                            <span class="text-[10px] text-muted-foreground">周六</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:10%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">10%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">2</span>
+                            <span class="text-[10px] text-muted-foreground">周日</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:12%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">12%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">3</span>
+                            <span class="text-[10px] text-muted-foreground">周一</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:55%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">55%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">4</span>
+                            <span class="text-[10px] text-muted-foreground">周二</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:62%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">62%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">5</span>
+                            <span class="text-[10px] text-muted-foreground">周三</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-warning rounded-full" style="width:95%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end gap-1 w-14">
+                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-warning"></i>
+                            <span class="text-sm font-medium text-warning cm-tabular">95%</span>
+                        </div>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">6</span>
+                            <span class="text-[10px] text-muted-foreground">周四</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:48%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">48%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">7</span>
+                            <span class="text-[10px] text-muted-foreground">周五</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:70%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">70%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">8</span>
+                            <span class="text-[10px] text-muted-foreground">周六</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:15%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">15%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">9</span>
+                            <span class="text-[10px] text-muted-foreground">周日</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:18%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">18%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">10</span>
+                            <span class="text-[10px] text-muted-foreground">周一</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:65%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">65%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">11</span>
+                            <span class="text-[10px] text-muted-foreground">周二</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:58%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">58%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-primary text-primary-foreground rounded-xl px-3 py-2.5 border border-primary flex items-center gap-3" aria-current="true">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold cm-tabular">12</span>
+                            <span class="text-[10px] text-primary-foreground/80">周三</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary-foreground/20 text-primary-foreground">班</span>
+                                <span class="text-xs text-primary-foreground/80">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-primary-foreground/30 rounded-full overflow-hidden">
+                                <div class="h-full bg-primary-foreground rounded-full" style="width:72%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-semibold cm-tabular w-10 text-right">72%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">13</span>
+                            <span class="text-[10px] text-muted-foreground">周四</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:48%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">48%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">14</span>
+                            <span class="text-[10px] text-muted-foreground">周五</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:82%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">82%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">15</span>
+                            <span class="text-[10px] text-muted-foreground">周六</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:30%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">30%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">16</span>
+                            <span class="text-[10px] text-muted-foreground">周日</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:20%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">20%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">17</span>
+                            <span class="text-[10px] text-muted-foreground">周一</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:60%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">60%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">18</span>
+                            <span class="text-[10px] text-muted-foreground">周二</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:68%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">68%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">19</span>
+                            <span class="text-[10px] text-muted-foreground">周三</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-error rounded-full" style="width:100%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end gap-1 w-14">
+                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-error"></i>
+                            <span class="text-sm font-medium text-error cm-tabular">100%</span>
+                        </div>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">20</span>
+                            <span class="text-[10px] text-muted-foreground">周四</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:54%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">54%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">21</span>
+                            <span class="text-[10px] text-muted-foreground">周五</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:76%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">76%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">22</span>
+                            <span class="text-[10px] text-muted-foreground">周六</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:22%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">22%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">23</span>
+                            <span class="text-[10px] text-muted-foreground">周日</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:18%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">18%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">24</span>
+                            <span class="text-[10px] text-muted-foreground">周一</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:63%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">63%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">25</span>
+                            <span class="text-[10px] text-muted-foreground">周二</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:57%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">57%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">26</span>
+                            <span class="text-[10px] text-muted-foreground">周三</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-error rounded-full" style="width:100%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end gap-1 w-14">
+                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-error"></i>
+                            <span class="text-sm font-medium text-error cm-tabular">105%</span>
+                        </div>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">27</span>
+                            <span class="text-[10px] text-muted-foreground">周四</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:49%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">49%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">28</span>
+                            <span class="text-[10px] text-muted-foreground">周五</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:71%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">71%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">29</span>
+                            <span class="text-[10px] text-muted-foreground">周六</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:16%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">16%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">30</span>
+                            <span class="text-[10px] text-muted-foreground">周日</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">休</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-slate-300 rounded-full" style="width:14%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-muted-foreground cm-tabular w-10 text-right">14%</span>
+                    </button>
+                    <button class="cm-day-card w-full text-left bg-card rounded-xl px-3 py-2.5 border border-border flex items-center gap-3 active:bg-muted">
+                        <div class="flex flex-col items-center min-w-[44px]">
+                            <span class="text-lg font-semibold text-foreground cm-tabular">31</span>
+                            <span class="text-[10px] text-muted-foreground">周一</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">班</span>
+                                <span class="text-xs text-muted-foreground">11h</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width:44%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-medium text-foreground cm-tabular w-10 text-right">44%</span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="px-4 py-3" data-region="selected-detail">
+                <div class="bg-card rounded-xl border border-border p-4" style="box-shadow:var(--cm-shadow-2)">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 class="text-base font-semibold text-foreground">2026-08-12 工令</h3>
+                            <p class="text-xs text-muted-foreground">已选日期 · 周三 · 计划 11h</p>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">已确认</span>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+                            <div class="w-9 h-9 flex items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
+                                <i data-lucide="container" class="w-5 h-5"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-semibold text-foreground cm-tabular">DFQD-2026-281-DS</span>
+                                    <span class="text-xs text-muted-foreground">80台</span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">40HC</span>
+                                    <span class="text-xs text-muted-foreground">TEU 80</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+                            <div class="w-9 h-9 flex items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
+                                <i data-lucide="container" class="w-5 h-5"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-semibold text-foreground cm-tabular">DFQD-2026-282-DS</span>
+                                    <span class="text-xs text-muted-foreground">30台</span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">Ener C+</span>
+                                    <span class="text-xs text-muted-foreground">TEU 30</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="px-4 py-2" data-region="readonly-hint">
+                <div class="flex items-start gap-2 text-xs text-muted-foreground bg-muted rounded-lg p-3">
+                    <i data-lucide="info" class="w-4 h-4 text-primary shrink-0 mt-0.5"></i>
+                    <p>移动端仅可查看，编辑请使用 PC 端排产工作台。</p>
+                </div>
+            </section>
+        </main>
+
+        <nav data-mobile-nav="global" class="cm-bottom-nav w-full bg-card border-t border-border fixed bottom-0 left-0 right-0" style="height:56px;z-index:50;">
+            <div class="grid grid-cols-3 h-full">
+                <a data-dom-id="nav-quick-order" href="quick-order.html" class="flex flex-col items-center justify-center gap-0.5 text-muted-foreground hover:text-foreground active:text-foreground transition-colors" aria-label="接单">
+                    <i data-lucide="message-square-plus" class="w-5 h-5"></i>
+                    <span class="text-[10px]">接单</span>
+                </a>
+                <a href="mobile-schedule.html" class="flex flex-col items-center justify-center gap-0.5 text-primary font-semibold" aria-current="page" aria-label="排产">
+                    <i data-lucide="calendar-days" class="w-5 h-5"></i>
+                    <span class="text-[10px]">排产</span>
+                </a>
+                <a data-dom-id="nav-mobile-approval" href="mobile-approval.html" class="flex flex-col items-center justify-center gap-0.5 text-muted-foreground hover:text-foreground active:text-foreground transition-colors" aria-label="审批">
+                    <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+                    <span class="text-[10px]">审批</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

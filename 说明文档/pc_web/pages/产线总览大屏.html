@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产线总览大屏</title>
+    <style id="theme-vars">
+:root {
+  /* Brand primary scale — industrial tech cyan */
+  --cm-primary-50: #ecfeff;
+  --cm-primary-100: #cffafe;
+  --cm-primary-200: #a5f3fc;
+  --cm-primary-300: #67e8f9;
+  --cm-primary-400: #22d3ee;
+  --cm-primary-500: #06b6d4;
+  --cm-primary-600: #0891b2;
+  --cm-primary-700: #0e7490;
+  --cm-primary-800: #155e75;
+  --cm-primary-900: #164e63;
+
+  /* Neutral slate scale */
+  --cm-slate-50: #f8fafc;
+  --cm-slate-100: #f1f5f9;
+  --cm-slate-200: #e2e8f0;
+  --cm-slate-300: #cbd5e1;
+  --cm-slate-400: #94a3b8;
+  --cm-slate-500: #64748b;
+  --cm-slate-600: #475569;
+  --cm-slate-700: #334155;
+  --cm-slate-800: #1e293b;
+  --cm-slate-900: #0f172a;
+
+  /* Semantic tokens */
+  --cm-background: var(--cm-slate-50);
+  --cm-foreground: var(--cm-slate-900);
+  --cm-card: #ffffff;
+  --cm-card-foreground: var(--cm-slate-900);
+  --cm-popover: #ffffff;
+  --cm-popover-foreground: var(--cm-slate-900);
+  --cm-primary: var(--cm-primary-600);
+  --cm-primary-foreground: #ffffff;
+  --cm-muted: var(--cm-slate-100);
+  --cm-muted-foreground: var(--cm-slate-500);
+  --cm-border: var(--cm-slate-200);
+  --cm-input: var(--cm-slate-200);
+  --cm-ring: var(--cm-primary-400);
+
+  /* State tokens */
+  --cm-state-success: #10b981;
+  --cm-state-success-bg: #d1fae5;
+  --cm-state-warning: #f59e0b;
+  --cm-state-warning-bg: #fef3c7;
+  --cm-state-error: #ef4444;
+  --cm-state-error-bg: #fee2e2;
+  --cm-state-info: var(--cm-primary-500);
+  --cm-state-info-bg: var(--cm-primary-50);
+
+  /* Radius */
+  --cm-radius-small: 4px;
+  --cm-radius-medium: 8px;
+  --cm-radius-large: 12px;
+  --cm-radius-full: 9999px;
+
+  /* Shadows */
+  --cm-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --cm-shadow-2: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+  --cm-shadow-3: 0 24px 60px -20px rgba(15, 23, 42, 0.22);
+
+  /* Typography */
+  --cm-font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --cm-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* Spacing scale */
+  --cm-s-1: 4px;
+  --cm-s-2: 8px;
+  --cm-s-3: 12px;
+  --cm-s-4: 16px;
+  --cm-s-5: 24px;
+  --cm-s-6: 32px;
+  --cm-s-7: 48px;
+  --cm-s-8: 64px;
+}
+
+html.dark {
+  --cm-background: #0b0f19;
+  --cm-foreground: #f1f5f9;
+  --cm-card: #111827;
+  --cm-card-foreground: #f1f5f9;
+  --cm-popover: #111827;
+  --cm-popover-foreground: #f1f5f9;
+  --cm-muted: #1e293b;
+  --cm-muted-foreground: #94a3b8;
+  --cm-border: #1e293b;
+  --cm-input: #1e293b;
+}
+
+body {
+  font-family: var(--cm-font-sans);
+  background-color: var(--cm-background);
+  color: var(--cm-foreground);
+}
+
+.cm-heading {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.cm-kpi-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cm-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--cm-background);
+    --color-foreground: var(--cm-foreground);
+    --color-card: var(--cm-card);
+    --color-card-foreground: var(--cm-card-foreground);
+    --color-popover: var(--cm-popover);
+    --color-popover-foreground: var(--cm-popover-foreground);
+    --color-primary: var(--cm-primary);
+    --color-primary-foreground: var(--cm-primary-foreground);
+    --color-muted: var(--cm-muted);
+    --color-muted-foreground: var(--cm-muted-foreground);
+    --color-border: var(--cm-border);
+    --color-input: var(--cm-input);
+    --color-ring: var(--cm-ring);
+    --radius-sm: var(--cm-radius-small);
+    --radius-md: var(--cm-radius-medium);
+    --radius-lg: var(--cm-radius-large);
+  }
+  @layer base {
+    body { background: var(--cm-background); color: var(--cm-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--cm-background); }
+      .text-background { color: var(--cm-background); }
+      .border-background { border-color: var(--cm-background); }
+      .ring-background { --tw-ring-color: var(--cm-background); }
+      .bg-foreground { background-color: var(--cm-foreground); }
+      .text-foreground { color: var(--cm-foreground); }
+      .border-foreground { border-color: var(--cm-foreground); }
+      .ring-foreground { --tw-ring-color: var(--cm-foreground); }
+      .bg-card { background-color: var(--cm-card); }
+      .text-card { color: var(--cm-card); }
+      .border-card { border-color: var(--cm-card); }
+      .ring-card { --tw-ring-color: var(--cm-card); }
+      .bg-card-foreground { background-color: var(--cm-card-foreground); }
+      .text-card-foreground { color: var(--cm-card-foreground); }
+      .border-card-foreground { border-color: var(--cm-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--cm-card-foreground); }
+      .bg-popover { background-color: var(--cm-popover); }
+      .text-popover { color: var(--cm-popover); }
+      .border-popover { border-color: var(--cm-popover); }
+      .ring-popover { --tw-ring-color: var(--cm-popover); }
+      .bg-popover-foreground { background-color: var(--cm-popover-foreground); }
+      .text-popover-foreground { color: var(--cm-popover-foreground); }
+      .border-popover-foreground { border-color: var(--cm-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--cm-popover-foreground); }
+      .bg-primary { background-color: var(--cm-primary); }
+      .text-primary { color: var(--cm-primary); }
+      .border-primary { border-color: var(--cm-primary); }
+      .ring-primary { --tw-ring-color: var(--cm-primary); }
+      .bg-primary-foreground { background-color: var(--cm-primary-foreground); }
+      .text-primary-foreground { color: var(--cm-primary-foreground); }
+      .border-primary-foreground { border-color: var(--cm-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--cm-primary-foreground); }
+      .bg-muted { background-color: var(--cm-muted); }
+      .text-muted { color: var(--cm-muted); }
+      .border-muted { border-color: var(--cm-muted); }
+      .ring-muted { --tw-ring-color: var(--cm-muted); }
+      .bg-muted-foreground { background-color: var(--cm-muted-foreground); }
+      .text-muted-foreground { color: var(--cm-muted-foreground); }
+      .border-muted-foreground { border-color: var(--cm-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--cm-muted-foreground); }
+      .bg-border { background-color: var(--cm-border); }
+      .text-border { color: var(--cm-border); }
+      .border-border { border-color: var(--cm-border); }
+      .ring-border { --tw-ring-color: var(--cm-border); }
+      .bg-input { background-color: var(--cm-input); }
+      .text-input { color: var(--cm-input); }
+      .border-input { border-color: var(--cm-input); }
+      .ring-input { --tw-ring-color: var(--cm-input); }
+      .bg-ring { background-color: var(--cm-ring); }
+      .text-ring { color: var(--cm-ring); }
+      .border-ring { border-color: var(--cm-ring); }
+      .ring-ring { --tw-ring-color: var(--cm-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <header class="cm-topbar">
+    <div class="cm-topbar-start">
+      <a href="#" class="cm-brand flex items-center gap-2 text-foreground no-underline">
+        <i data-lucide="container" class="w-7 h-7 text-primary"></i>
+        <span class="text-lg font-semibold tracking-tight">ContainerMind</span>
+      </a>
+      <nav class="cm-nav" aria-label="全局导航">
+        <a id="nav-planning" data-dom-id="nav-planning" href="planning-workbench.html" class="cm-nav-link">
+          <i data-lucide="calendar-days" class="w-4 h-4"></i>
+          <span>排产工作台</span>
+        </a>
+        <a id="nav-agent-chat" data-dom-id="nav-agent-chat" href="agent-chat.html" class="cm-nav-link">
+          <i data-lucide="bot-message-square" class="w-4 h-4"></i>
+          <span>Agent 对话台</span>
+        </a>
+        <a id="nav-approval" data-dom-id="nav-approval" href="approval.html" class="cm-nav-link">
+          <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+          <span>审批工作台</span>
+        </a>
+      </nav>
+    </div>
+    <div class="cm-topbar-end">
+      <div class="cm-factory-select flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted text-sm">
+        <i data-lucide="factory" class="w-4 h-4 text-muted-foreground"></i>
+        <select class="bg-transparent border-none outline-none text-sm cursor-pointer" aria-label="工厂选择">
+          <option value="QD-D" selected>启东工厂 QD-D</option>
+          <option value="SH-A">上海工厂 SH-A</option>
+          <option value="NT-A">南通工厂 NT-A</option>
+          <option value="NT-B">南通工厂 NT-B</option>
+          <option value="LYG-A">连云港工厂 LYG-A</option>
+        </select>
+      </div>
+      <div class="cm-user flex items-center gap-3 pl-4 border-l border-border">
+        <div class="text-right hidden sm:block">
+          <div class="text-sm font-medium">王建国</div>
+          <div class="text-xs text-muted-foreground">生产主管</div>
+        </div>
+        <div class="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold" aria-label="用户头像">王</div>
+      </div>
+    </div>
+  </header>
+
+  <section id="kpi-header" class="cm-kpi-row" aria-label="关键指标">
+    <article class="cm-kpi-card">
+      <div class="text-sm text-muted-foreground mb-1">今日计划产量</div>
+      <div class="flex items-end gap-2">
+        <span class="cm-kpi-value text-2xl text-foreground">42</span>
+        <span class="text-sm text-muted-foreground mb-1">TEU</span>
+      </div>
+      <div class="mt-2 text-xs text-success flex items-center gap-1">
+        <i data-lucide="trending-up" class="w-3 h-3"></i>
+        <span>较昨日 +5.0%</span>
+      </div>
+    </article>
+    <article class="cm-kpi-card">
+      <div class="text-sm text-muted-foreground mb-1">实际产量</div>
+      <div class="flex items-end gap-2">
+        <span class="cm-kpi-value text-2xl text-foreground">38</span>
+        <span class="text-sm text-muted-foreground mb-1">TEU</span>
+      </div>
+      <div class="mt-2 text-xs text-warning flex items-center gap-1">
+        <i data-lucide="alert-circle" class="w-3 h-3"></i>
+        <span>落后计划 4 TEU</span>
+      </div>
+    </article>
+    <article class="cm-kpi-card">
+      <div class="text-sm text-muted-foreground mb-1">产能达成率</div>
+      <div class="flex items-end gap-2">
+        <span class="cm-kpi-value text-2xl text-primary">90.5</span>
+        <span class="text-sm text-primary mb-1">%</span>
+      </div>
+      <div class="mt-2 text-xs text-muted-foreground">目标 95%</div>
+    </article>
+    <article class="cm-kpi-card">
+      <div class="text-sm text-muted-foreground mb-1">OEE</div>
+      <div class="flex items-end gap-2">
+        <span class="cm-kpi-value text-2xl text-foreground">84.2</span>
+        <span class="text-sm text-muted-foreground mb-1">%</span>
+      </div>
+      <div class="mt-2 text-xs text-success flex items-center gap-1">
+        <i data-lucide="trending-up" class="w-3 h-3"></i>
+        <span>较昨日 +1.2%</span>
+      </div>
+    </article>
+    <article class="cm-kpi-card">
+      <div class="text-sm text-muted-foreground mb-1">设备在线率</div>
+      <div class="flex items-end gap-2">
+        <span class="cm-kpi-value text-2xl text-foreground">96.8</span>
+        <span class="text-sm text-muted-foreground mb-1">%</span>
+      </div>
+      <div class="mt-2 text-xs text-muted-foreground">在线 30 / 31 台</div>
+    </article>
+    <article class="cm-kpi-card">
+      <div class="text-sm text-muted-foreground mb-1">未关闭异常</div>
+      <div class="flex items-end gap-2">
+        <span class="cm-kpi-value text-2xl text-error">3</span>
+        <span class="text-sm text-muted-foreground mb-1">条</span>
+      </div>
+      <div class="mt-2 text-xs text-error flex items-center gap-1">
+        <i data-lucide="bell" class="w-3 h-3"></i>
+        <span>2 条严重</span>
+      </div>
+    </article>
+  </section>
+
+  <main class="cm-dashboard-grid">
+    <div class="cm-left-column">
+      <section id="line-status" class="cm-card">
+        <div class="cm-section-title">
+          <div class="flex items-center gap-2">
+            <i data-lucide="activity" class="w-5 h-5 text-primary"></i>
+            <h2>产线状态</h2>
+          </div>
+          <span class="text-xs text-muted-foreground">实时刷新 10:23</span>
+        </div>
+        <div class="cm-line-list">
+          <div class="cm-line-card">
+            <div class="cm-line-card-main">
+              <div class="flex items-center gap-3">
+                <span class="cm-status-badge cm-status-running"><span class="w-1.5 h-1.5 rounded-full bg-current"></span>运行</span>
+                <span class="font-semibold text-foreground">QD-D</span>
+                <span class="text-xs text-muted-foreground">启东工厂</span>
+              </div>
+              <div class="text-sm text-muted-foreground mt-1">40ft 标准箱 · 当前型号 SC-40HC</div>
+            </div>
+            <div class="cm-line-card-stats">
+              <div>
+                <div class="text-xs text-muted-foreground">计划</div>
+                <div class="cm-tabular font-semibold">42</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">实际</div>
+                <div class="cm-tabular font-semibold text-primary">38</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">达成</div>
+                <div class="cm-tabular font-semibold">90.5%</div>
+              </div>
+            </div>
+          </div>
+          <div class="cm-line-card">
+            <div class="cm-line-card-main">
+              <div class="flex items-center gap-3">
+                <span class="cm-status-badge cm-status-running"><span class="w-1.5 h-1.5 rounded-full bg-current"></span>运行</span>
+                <span class="font-semibold text-foreground">SH-A</span>
+                <span class="text-xs text-muted-foreground">上海工厂</span>
+              </div>
+              <div class="text-sm text-muted-foreground mt-1">20ft 冷藏箱 · 当前型号 RF-20RS</div>
+            </div>
+            <div class="cm-line-card-stats">
+              <div>
+                <div class="text-xs text-muted-foreground">计划</div>
+                <div class="cm-tabular font-semibold">28</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">实际</div>
+                <div class="cm-tabular font-semibold text-primary">26</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">达成</div>
+                <div class="cm-tabular font-semibold">92.9%</div>
+              </div>
+            </div>
+          </div>
+          <div class="cm-line-card">
+            <div class="cm-line-card-main">
+              <div class="flex items-center gap-3">
+                <span class="cm-status-badge cm-status-slow"><span class="w-1.5 h-1.5 rounded-full bg-current"></span>降速</span>
+                <span class="font-semibold text-foreground">NT-A</span>
+                <span class="text-xs text-muted-foreground">南通工厂</span>
+              </div>
+              <div class="text-sm text-muted-foreground mt-1">40ft 开顶箱 · 当前型号 OT-40OP</div>
+            </div>
+            <div class="cm-line-card-stats">
+              <div>
+                <div class="text-xs text-muted-foreground">计划</div>
+                <div class="cm-tabular font-semibold">18</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">实际</div>
+                <div class="cm-tabular font-semibold text-warning">14</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">达成</div>
+                <div class="cm-tabular font-semibold">77.8%</div>
+              </div>
+            </div>
+          </div>
+          <div class="cm-line-card">
+            <div class="cm-line-card-main">
+              <div class="flex items-center gap-3">
+                <span class="cm-status-badge cm-status-maint"><span class="w-1.5 h-1.5 rounded-full bg-current"></span>检修</span>
+                <span class="font-semibold text-foreground">NT-B</span>
+                <span class="text-xs text-muted-foreground">南通工厂</span>
+              </div>
+              <div class="text-sm text-muted-foreground mt-1">20ft 干货箱 · 当前型号 GP-20DV</div>
+            </div>
+            <div class="cm-line-card-stats">
+              <div>
+                <div class="text-xs text-muted-foreground">计划</div>
+                <div class="cm-tabular font-semibold">22</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">实际</div>
+                <div class="cm-tabular font-semibold text-error">0</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">达成</div>
+                <div class="cm-tabular font-semibold">0.0%</div>
+              </div>
+            </div>
+          </div>
+          <div class="cm-line-card">
+            <div class="cm-line-card-main">
+              <div class="flex items-center gap-3">
+                <span class="cm-status-badge cm-status-stop"><span class="w-1.5 h-1.5 rounded-full bg-current"></span>停机</span>
+                <span class="font-semibold text-foreground">LYG-A</span>
+                <span class="text-xs text-muted-foreground">连云港工厂</span>
+              </div>
+              <div class="text-sm text-muted-foreground mt-1">40ft 高箱 · 当前型号 HQ-40HC</div>
+            </div>
+            <div class="cm-line-card-stats">
+              <div>
+                <div class="text-xs text-muted-foreground">计划</div>
+                <div class="cm-tabular font-semibold">30</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">实际</div>
+                <div class="cm-tabular font-semibold text-error">0</div>
+              </div>
+              <div>
+                <div class="text-xs text-muted-foreground">达成</div>
+                <div class="cm-tabular font-semibold">0.0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="capacity-chart" class="cm-card">
+        <div class="cm-section-title">
+          <div class="flex items-center gap-2">
+            <i data-lucide="bar-chart-3" class="w-5 h-5 text-primary"></i>
+            <h2>产能达成</h2>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-muted-foreground">
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm" style="background:#cbd5e1"></span>计划</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-1 rounded-full" style="background:#0891b2"></span>实际</span>
+          </div>
+        </div>
+        <div id="capacityChart" class="w-full" style="height:320px;"></div>
+      </section>
+    </div>
+
+    <div class="cm-right-column">
+      <section id="equipment-health" class="cm-card">
+        <div class="cm-section-title">
+          <div class="flex items-center gap-2">
+            <i data-lucide="heart-pulse" class="w-5 h-5 text-primary"></i>
+            <h2>设备健康</h2>
+          </div>
+          <span class="text-xs text-muted-foreground">5 台关键设备</span>
+        </div>
+        <div class="cm-equipment-list">
+          <div class="cm-equipment-item">
+            <div class="cm-equipment-row">
+              <div class="flex items-center gap-2">
+                <i data-lucide="settings" class="w-4 h-4 text-muted-foreground"></i>
+                <span class="text-sm font-medium">焊接机器人</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-success">92%</span>
+                <span class="text-xs px-2 py-0.5 rounded-full text-success" style="background:var(--cm-state-success-bg)">正常</span>
+              </div>
+            </div>
+            <div class="cm-progress-bg"><div class="cm-progress-fill bg-success" style="width:92%"></div></div>
+            <div class="text-xs text-muted-foreground">RUL 剩余 1,200 小时</div>
+          </div>
+          <div class="cm-equipment-item">
+            <div class="cm-equipment-row">
+              <div class="flex items-center gap-2">
+                <i data-lucide="paint-bucket" class="w-4 h-4 text-muted-foreground"></i>
+                <span class="text-sm font-medium">涂装线</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-warning">78%</span>
+                <span class="text-xs px-2 py-0.5 rounded-full text-warning" style="background:var(--cm-state-warning-bg)">预警</span>
+              </div>
+            </div>
+            <div class="cm-progress-bg"><div class="cm-progress-fill bg-warning" style="width:78%"></div></div>
+            <div class="text-xs text-warning">RUL 剩余 560 小时 · 建议下周点检</div>
+          </div>
+          <div class="cm-equipment-item">
+            <div class="cm-equipment-row">
+              <div class="flex items-center gap-2">
+                <i data-lucide="gauge" class="w-4 h-4 text-muted-foreground"></i>
+                <span class="text-sm font-medium">气密检测设备</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-success">88%</span>
+                <span class="text-xs px-2 py-0.5 rounded-full text-success" style="background:var(--cm-state-success-bg)">正常</span>
+              </div>
+            </div>
+            <div class="cm-progress-bg"><div class="cm-progress-fill bg-success" style="width:88%"></div></div>
+            <div class="text-xs text-muted-foreground">RUL 剩余 890 小时</div>
+          </div>
+          <div class="cm-equipment-item">
+            <div class="cm-equipment-row">
+              <div class="flex items-center gap-2">
+                <i data-lucide="move-diagonal" class="w-4 h-4 text-muted-foreground"></i>
+                <span class="text-sm font-medium">折弯机</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-error">65%</span>
+                <span class="text-xs px-2 py-0.5 rounded-full text-error" style="background:var(--cm-state-error-bg)">警告</span>
+              </div>
+            </div>
+            <div class="cm-progress-bg"><div class="cm-progress-fill bg-error" style="width:65%"></div></div>
+            <div class="text-xs text-error">RUL 剩余 320 小时 · 伺服系统需关注</div>
+          </div>
+          <div class="cm-equipment-item">
+            <div class="cm-equipment-row">
+              <div class="flex items-center gap-2">
+                <i data-lucide="scissors" class="w-4 h-4 text-muted-foreground"></i>
+                <span class="text-sm font-medium">切割机</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-success">95%</span>
+                <span class="text-xs px-2 py-0.5 rounded-full text-success" style="background:var(--cm-state-success-bg)">正常</span>
+              </div>
+            </div>
+            <div class="cm-progress-bg"><div class="cm-progress-fill bg-success" style="width:95%"></div></div>
+            <div class="text-xs text-muted-foreground">RUL 剩余 1,500 小时</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="alert-feed" class="cm-card">
+        <div class="cm-section-title">
+          <div class="flex items-center gap-2">
+            <i data-lucide="bell-ring" class="w-5 h-5 text-primary"></i>
+            <h2>异常告警</h2>
+          </div>
+          <span class="text-xs text-error font-medium">3 未关闭</span>
+        </div>
+        <div class="cm-alert-list">
+          <div class="cm-alert-item">
+            <div class="mt-0.5"><i data-lucide="alert-octagon" class="w-5 h-5 text-error"></i></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-foreground">焊接机器人轴2温度异常</div>
+              <div class="cm-alert-meta mt-1">
+                <span>08:42</span>
+                <span>·</span>
+                <span>负责：设备Agent</span>
+                <span>·</span>
+                <span class="text-error">处理中</span>
+              </div>
+            </div>
+          </div>
+          <div class="cm-alert-item">
+            <div class="mt-0.5"><i data-lucide="alert-triangle" class="w-5 h-5 text-warning"></i></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-foreground">涂装线排风压差偏低</div>
+              <div class="cm-alert-meta mt-1">
+                <span>08:15</span>
+                <span>·</span>
+                <span>负责：工艺Agent</span>
+                <span>·</span>
+                <span class="text-warning">待确认</span>
+              </div>
+            </div>
+          </div>
+          <div class="cm-alert-item">
+            <div class="mt-0.5"><i data-lucide="info" class="w-5 h-5 text-info"></i></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-foreground">QD-D 班次计划已下发</div>
+              <div class="cm-alert-meta mt-1">
+                <span>07:50</span>
+                <span>·</span>
+                <span>负责：排产Agent</span>
+                <span>·</span>
+                <span class="text-muted-foreground">已关闭</span>
+              </div>
+            </div>
+          </div>
+          <div class="cm-alert-item">
+            <div class="mt-0.5"><i data-lucide="alert-octagon" class="w-5 h-5 text-error"></i></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-foreground">NT-B 折弯机伺服报警</div>
+              <div class="cm-alert-meta mt-1">
+                <span>07:20</span>
+                <span>·</span>
+                <span>负责：设备Agent</span>
+                <span>·</span>
+                <span class="text-error">处理中</span>
+              </div>
+            </div>
+          </div>
+          <div class="cm-alert-item">
+            <div class="mt-0.5"><i data-lucide="alert-triangle" class="w-5 h-5 text-warning"></i></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-foreground">气密检测工位节拍超时</div>
+              <div class="cm-alert-meta mt-1">
+                <span>06:55</span>
+                <span>·</span>
+                <span>负责：质量Agent</span>
+                <span>·</span>
+                <span class="text-warning">待确认</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      var chartDom = document.getElementById('capacityChart');
+      if (chartDom && typeof echarts !== 'undefined') {
+        var myChart = echarts.init(chartDom);
+        var option = {
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: { data: ['计划产量', '实际产量'], bottom: 0, textStyle: { color: '#475569' } },
+          grid: { left: '3%', right: '4%', bottom: '14%', top: '10%', containLabel: true },
+          xAxis: { type: 'category', data: ['08-08', '08-09', '08-10', '08-11', '08-12', '08-13', '今日'], axisLine: { lineStyle: { color: '#e2e8f0' } }, axisLabel: { color: '#64748b' } },
+          yAxis: { type: 'value', name: 'TEU', nameTextStyle: { color: '#64748b' }, axisLine: { show: false }, splitLine: { lineStyle: { color: '#f1f5f9' } }, axisLabel: { color: '#64748b' } },
+          series: [
+            { name: '计划产量', type: 'bar', data: [40, 42, 41, 43, 42, 44, 42], itemStyle: { color: '#cbd5e1', borderRadius: [4, 4, 0, 0] }, barWidth: '40%' },
+            { name: '实际产量', type: 'line', data: [38, 41, 39, 42, 40, 43, 38], itemStyle: { color: '#0891b2' }, lineStyle: { width: 3 }, symbolSize: 6 }
+          ]
+        };
+        myChart.setOption(option);
+        window.addEventListener('resize', function() { myChart.resize(); });
+      }
+      if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+    })();
+  </script>
+
+    <style id="critical-layout">
+      :root { --cm-topbar-h: 56px; }
+      .cm-topbar { display:flex; align-items:center; justify-content:space-between; height:var(--cm-topbar-h); min-width:1280px; padding:0 24px; background:var(--cm-card); border-bottom:1px solid var(--cm-border); box-sizing:border-box; }
+      .cm-topbar-start, .cm-topbar-end { display:flex; align-items:center; gap:16px; }
+      .cm-nav { display:flex; align-items:center; gap:8px; margin-left:24px; }
+      .cm-nav-link { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:var(--cm-radius-medium); color:var(--cm-slate-600); text-decoration:none; font-size:14px; font-weight:500; }
+      .cm-nav-link:hover { background:var(--cm-slate-100); color:var(--cm-slate-900); }
+      .cm-kpi-row { display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:16px; min-width:1280px; padding:16px 24px 0; box-sizing:border-box; }
+      .cm-kpi-card { background:var(--cm-card); border:1px solid var(--cm-border); border-radius:var(--cm-radius-medium); padding:16px; min-height:96px; box-shadow:var(--cm-shadow-1); box-sizing:border-box; }
+      .cm-dashboard-grid { display:grid; grid-template-columns:minmax(0, 1.5fr) minmax(0, 1fr); gap:16px; min-width:1280px; padding:16px 24px 24px; box-sizing:border-box; }
+      .cm-left-column, .cm-right-column { display:flex; flex-direction:column; gap:16px; }
+      .cm-card { background:var(--cm-card); border:1px solid var(--cm-border); border-radius:var(--cm-radius-large); padding:20px; box-shadow:var(--cm-shadow-1); box-sizing:border-box; }
+      .cm-section-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; font-size:16px; font-weight:600; }
+      .cm-section-title h2 { margin:0; font-size:inherit; font-weight:inherit; }
+      .text-primary { color:var(--cm-primary); }
+      .text-success { color:var(--cm-state-success); }
+      .text-warning { color:var(--cm-state-warning); }
+      .text-error { color:var(--cm-state-error); }
+      .text-info { color:var(--cm-state-info); }
+      .bg-success { background-color:var(--cm-state-success); }
+      .bg-warning { background-color:var(--cm-state-warning); }
+      .bg-error { background-color:var(--cm-state-error); }
+      .bg-info { background-color:var(--cm-state-info); }
+      .cm-status-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:500; }
+      .cm-status-running { background:var(--cm-state-success-bg); color:var(--cm-state-success); }
+      .cm-status-stop { background:var(--cm-state-error-bg); color:var(--cm-state-error); }
+      .cm-status-slow { background:var(--cm-state-warning-bg); color:var(--cm-state-warning); }
+      .cm-status-maint { background:var(--cm-state-info-bg); color:var(--cm-state-info); }
+      .cm-line-list { display:flex; flex-direction:column; gap:12px; }
+      .cm-line-card { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--cm-slate-50); border:1px solid var(--cm-border); border-radius:var(--cm-radius-medium); }
+      .cm-line-card-main { min-width:0; }
+      .cm-line-card-stats { display:flex; gap:24px; text-align:right; flex-shrink:0; }
+      .cm-equipment-list { display:flex; flex-direction:column; gap:16px; }
+      .cm-equipment-item { display:flex; flex-direction:column; gap:8px; }
+      .cm-equipment-row { display:flex; align-items:center; justify-content:space-between; }
+      .cm-progress-bg { height:8px; background:var(--cm-muted); border-radius:999px; overflow:hidden; }
+      .cm-progress-fill { height:100%; border-radius:999px; }
+      .cm-alert-list { display:flex; flex-direction:column; }
+      .cm-alert-item { display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--cm-border); }
+      .cm-alert-item:last-child { border-bottom:none; }
+      .cm-alert-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; color:var(--cm-slate-500); }
+      @media (max-width:1279px) { .cm-dashboard-grid, .cm-kpi-row, .cm-topbar { min-width:auto; } .cm-kpi-row { grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+    </style>
+</body>
+</html>

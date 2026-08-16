@@ -1,0 +1,37 @@
+# ContainerMind 多环境配置
+# 运行方式：python run.py dev|sit|uat|prod（默认 dev）
+# 公共配置在 app 段；各环境配置覆盖公共配置。{base_dir} 会替换为服务端根目录。
+app:
+  app_name: ContainerMind API
+  app_description: 集装箱制造业工业Agent协同系统 · 后端服务
+  api_prefix: /api/v1
+  host: 0.0.0.0
+  port: 8000
+
+# ============ 开发环境 ============
+dev:
+  database: sqlite:///{base_dir}/data/containermind.db
+  llm_base_url: https://api.deepseek.com
+  llm_api_key: "sk-9bbe818509844cfab1cff7518e31ac2c"
+  llm_model: deepseek-v4-flash
+
+# ============ 集成测试环境 ============
+sit:
+  database: sqlite:///{base_dir}/data/containermind.db
+  llm_base_url: https://api.deepseek.com/v1
+  llm_api_key: ""
+  llm_model: deepseek-v4-flash-0731
+
+# ============ 用户验收环境 ============
+uat:
+  database: sqlite:///{base_dir}/data/containermind.db
+  llm_base_url: https://api.deepseek.com/v1
+  llm_api_key: ""
+  llm_model: deepseek-v4-flash-0731
+
+# ============ 生产环境 ============
+prod:
+  database: mysql+pymysql://containermind:changeme@127.0.0.1:3306/containermind?charset=utf8mb4
+  llm_base_url: https://api.deepseek.com/v1
+  llm_api_key: ""
+  llm_model: deepseek-v4-flash-0731
