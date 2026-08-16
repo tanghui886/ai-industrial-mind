@@ -12,7 +12,7 @@ app:
 dev:
   database: sqlite:///{base_dir}/data/containermind.db
   llm_base_url: https://api.deepseek.com
-  llm_api_key: "sk-9bbe818509844cfab1cff7518e31ac2c"
+  llm_api_key: ""
   llm_model: deepseek-v4-flash
 
 # ============ 集成测试环境 ============
