@@ -186,7 +186,7 @@ def build_response(message: str, db: Session, llm_result: dict | None = None,
                 text = "所有产线设备运行正常，暂无异常设备。"
     elif intent == "material_gap":
         from .agents import material_gap as _agent_gap
-        data = _agent_gap(db)
+        data = _agent_gap(db=db)
         card = {"type": "material_gap", "title": "物料缺口", "data": data}
         gaps = [r for r in data.get("gaps") or [] if r["gap"] > 0]
         if gaps:
@@ -198,7 +198,7 @@ def build_response(message: str, db: Session, llm_result: dict | None = None,
             text = "当前各物料库存均可满足排产需求，暂无物料缺口。"
     elif intent == "storage_risk":
         from .agents import storage_risk as _agent_storage
-        data = _agent_storage(db)
+        data = _agent_storage(db=db)
         card = {"type": "storage_risk", "title": "堆存风险", "data": data}
         risks = [r for r in data.get("lines") or [] if r["status"] == "风险"]
         if risks:
@@ -210,7 +210,7 @@ def build_response(message: str, db: Session, llm_result: dict | None = None,
             text = "各产线堆存均有足够剩余空间，未发现爆仓风险。"
     elif intent == "cost_analysis":
         from .agents import cost_analysis as _agent_cost
-        data = _agent_cost(db)
+        data = _agent_cost(db=db)
         card = {"type": "cost", "title": "成本动因分析", "data": data}
         items = data.get("per_box_cost") or []
         text = (f"{data.get('month')} 单箱成本拆解：\n"
