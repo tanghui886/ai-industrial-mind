@@ -173,7 +173,7 @@ class Material(Base):
     code: Mapped[str] = mapped_column(String(32), unique=True)
     name: Mapped[str] = mapped_column(String(64))
     category: Mapped[str] = mapped_column(String(32))
-    factory: Mapped[str] = mapped_column(String(16), default="DFQD")   # 所属工厂
+    factory: Mapped[str] = mapped_column(String(16), default="SHPD")   # 所属工厂
     unit: Mapped[str] = mapped_column(String(16), default="")          # 物料单位（吨/箱/张/套）
     stock_note: Mapped[str] = mapped_column(String(128), default="")
     in_stock_units: Mapped[int] = mapped_column(Integer, default=0)          # 在库物料总量
@@ -232,6 +232,27 @@ class RoleMenu(Base):
     role: Mapped[str] = mapped_column(String(32), index=True)
     menu_code: Mapped[str] = mapped_column(String(32))
     __table_args__ = (UniqueConstraint("role", "menu_code", name="uq_role_menu"),)
+
+
+class Menu(Base):
+    """系统菜单定义（可配置菜单树）：
+    - code: 菜单编码（角色配置/路由守卫使用）
+    - path: 路由路径；分组菜单（有子菜单）path 可为空
+    - parent_code: 父菜单编码，空表示顶级菜单
+    - icon: 前端图标名（lucide 图标字符串）
+    - admin_only: 仅管理员可见（如系统设置下的管理菜单）
+    - is_builtin: 内置菜单，不可删除
+    """
+    __tablename__ = "menu"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String(32), unique=True)
+    name: Mapped[str] = mapped_column(String(64))
+    path: Mapped[str] = mapped_column(String(128), default="")
+    parent_code: Mapped[str] = mapped_column(String(32), default="")
+    icon: Mapped[str] = mapped_column(String(32), default="")
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    admin_only: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_builtin: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class MonthlyPlanTarget(Base):

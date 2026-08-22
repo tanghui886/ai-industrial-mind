@@ -8,7 +8,7 @@ import {
 import { getCapacityBrief, getDayOrders, getFactories } from '@/api'
 
 const month = ref('2026-08')
-const lineCode = ref('QD-D')
+const lineCode = ref('PD-D')
 const loading = ref(false)
 const brief = ref<any>(null)
 const factories = ref<any[]>([])

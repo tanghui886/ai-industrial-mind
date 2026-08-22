@@ -10,11 +10,11 @@ const stats = ref<any>({ total: {}, by_factory: [] })
 const factoryFilter = ref('')
 const dialogVisible = ref(false)
 const editing = ref<any | null>(null)
-const form = ref({ code: '', name: '', category: '', factory: 'DFQD', unit: '', stock_note: '', in_stock_units: 0, support_units: 0, in_transit_units: 0, purchase_units: 0, arrival_date: '', status: '充足' })
+const form = ref({ code: '', name: '', category: '', factory: 'SHPD', unit: '', stock_note: '', in_stock_units: 0, support_units: 0, in_transit_units: 0, purchase_units: 0, arrival_date: '', status: '充足' })
 
 const STATUS_OPTIONS = ['充足', '需补货', '预警']
 const statusTag: Record<string, string> = { 充足: 'tag-success', 需补货: 'tag-warning', 预警: 'tag-error' }
-const FACTORY_OPTIONS = ['DFQD', 'DFSH', 'DFNT', 'DFLYG']
+const FACTORY_OPTIONS = ['SHPD', 'SHBS', 'SHJS', 'SHFX']
 
 const filteredRows = ref<any[]>([])
 
@@ -35,14 +35,14 @@ async function load() {
 
 function openAdd() {
   editing.value = null
-  form.value = { code: '', name: '', category: '', factory: 'DFQD', unit: '', stock_note: '', in_stock_units: 0, support_units: 0, in_transit_units: 0, purchase_units: 0, arrival_date: '', status: '充足' }
+  form.value = { code: '', name: '', category: '', factory: 'SHPD', unit: '', stock_note: '', in_stock_units: 0, support_units: 0, in_transit_units: 0, purchase_units: 0, arrival_date: '', status: '充足' }
   dialogVisible.value = true
 }
 
 function openEdit(row: any) {
   editing.value = row
   form.value = {
-    code: row.code, name: row.name, category: row.category, factory: row.factory || 'DFQD',
+    code: row.code, name: row.name, category: row.category, factory: row.factory || 'SHPD',
     unit: row.unit || '', stock_note: row.stock_note || '', in_stock_units: row.in_stock_units || 0,
     support_units: row.support_units || 0, in_transit_units: row.in_transit_units || 0, purchase_units: row.purchase_units || 0,
     arrival_date: row.arrival_date || '', status: row.status,
@@ -56,7 +56,7 @@ async function submit() {
   }
   const payload = {
     ...form.value,
-    factory: form.value.factory || 'DFQD',
+    factory: form.value.factory || 'SHPD',
     arrival_date: form.value.arrival_date || null,
   }
   try {

@@ -18,6 +18,12 @@ async function onSubmit() {
       user: { username: 'zhang', display_name: '张业务', role: '业务经理' },
       perms: ['workorder.add', 'workorder.edit', 'workorder.delete'],
       menus: ['dashboard', 'planning', 'agent', 'approval'],
+      menu_tree: [
+        { code: 'dashboard', name: '产线总览', path: '/pc/dashboard', icon: 'LayoutDashboard' },
+        { code: 'agent', name: 'Agent 对话台', path: '/pc/agent', icon: 'BotMessageSquare' },
+        { code: 'planning', name: '排产工作台', path: '/pc/planning', icon: 'CalendarDays' },
+        { code: 'approval', name: '审批工作台', path: '/pc/approval', icon: 'ClipboardCheck' },
+      ],
     })
     ElMessage.success('登录成功')
     router.push('/pc/dashboard')
@@ -27,7 +33,7 @@ async function onSubmit() {
   try {
     const res = await login({ username: form.value.username, password: form.value.password })
     localStorage.setItem('cm_token', res.token)
-    persistAuth({ user: res.user, perms: res.perms, menus: res.menus })
+    persistAuth({ user: res.user, perms: res.perms, menus: res.menus, menu_tree: res.menu_tree })
     ElMessage.success('登录成功')
     router.push('/pc/dashboard')
   } catch (e: any) { ElMessage.error(e.message) } finally { loading.value = false }

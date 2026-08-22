@@ -31,7 +31,7 @@ class MaterialIn(BaseModel):
     code: str
     name: str
     category: str
-    factory: str = "DFQD"
+    factory: str = "SHPD"
     unit: str = ""
     stock_note: str = ""
     in_stock_units: int = 0
@@ -109,7 +109,7 @@ def create_material(body: MaterialIn, _: str = Depends(require_perm("material.ma
     if db.query(Material).filter(Material.code == code).first():
         raise HTTPException(400, f"物料编码「{code}」已存在")
     db.add(Material(code=code, name=body.name.strip(), category=body.category.strip(),
-                    factory=body.factory.strip() or "DFQD", unit=body.unit.strip(),
+                    factory=body.factory.strip() or "SHPD", unit=body.unit.strip(),
                     stock_note=body.stock_note.strip(),
                     in_stock_units=body.in_stock_units,
                     order_deducted_units=body.order_deducted_units,
@@ -139,7 +139,7 @@ def update_material(material_id: int, body: MaterialIn,
     m.code = body.code.strip()
     m.name = body.name.strip()
     m.category = body.category.strip()
-    m.factory = body.factory.strip() or "DFQD"
+    m.factory = body.factory.strip() or "SHPD"
     m.unit = body.unit.strip()
     m.stock_note = body.stock_note.strip()
     m.in_stock_units = body.in_stock_units

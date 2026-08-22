@@ -55,10 +55,17 @@ export const updateRole = (name: string, data: { name: string; description?: str
   http.put(`/admin/roles/${encodeURIComponent(name)}`, data) as Promise<any>
 export const deleteRole = (name: string) =>
   http.delete(`/admin/roles/${encodeURIComponent(name)}`) as Promise<any>
-// 菜单配置
+// 菜单配置（角色勾选可见菜单）
 export const getMenus = () => http.get('/admin/menus') as Promise<any>
 export const saveMenus = (data: { role: string; menus: string[] }) =>
   http.put('/admin/menus', data) as Promise<any>
+// 菜单定义管理（菜单管理页 CRUD）
+export const getMenuDefs = () => http.get('/admin/menu-defs') as Promise<any[]>
+export const createMenuDef = (data: any) => http.post('/admin/menu-defs', data) as Promise<any>
+export const updateMenuDef = (code: string, data: any) =>
+  http.put(`/admin/menu-defs/${encodeURIComponent(code)}`, data) as Promise<any>
+export const deleteMenuDef = (code: string) =>
+  http.delete(`/admin/menu-defs/${encodeURIComponent(code)}`) as Promise<any>
 
 // ---------- 物料维护 ----------
 export const getMaterialList = () => http.get('/material/list') as Promise<any[]>
@@ -67,6 +74,11 @@ export const createMaterial = (data: any) => http.post('/material/', data) as Pr
 export const updateMaterial = (id: number, data: any) =>
   http.put(`/material/${id}`, data) as Promise<any>
 export const deleteMaterial = (id: number) => http.delete(`/material/${id}`) as Promise<any>
+
+// ---------- 供货商动态 ----------
+export const getSupplierAvailability = (params?: { supplier?: string; material?: string; months?: number }) =>
+  http.get('/supplier/availability', { params }) as Promise<any>
+export const getSupplierOptions = () => http.get('/supplier/options') as Promise<any>
 
 // ---------- 设备管理 ----------
 export const getStorageList = () => http.get('/storage/list') as Promise<any[]>
@@ -114,7 +126,7 @@ export const getLlmLogs = (params?: { scene?: string; user?: string; session_id?
   http.get('/llm-log/records', { params }) as Promise<any>
 
 // ---------- 总览大屏 ----------
-export const getDashboard = (line_code = 'QD-D') =>
+export const getDashboard = (line_code = 'PD-D') =>
   http.get('/dashboard/overview', { params: { line_code } }) as Promise<any>
 
 // ---------- 排产 ----------
@@ -205,7 +217,7 @@ export const getMyOrders = (user?: string) =>
   http.get('/mobile/my-orders', { params: user ? { user } : {} }) as Promise<any[]>
 export const getCapacityBrief = (params: { line_code: string; month: string }) =>
   http.get('/mobile/capacity-brief', { params }) as Promise<any>
-export const getDayOrders = (day: string, line_code = 'QD-D') =>
+export const getDayOrders = (day: string, line_code = 'PD-D') =>
   http.get('/mobile/day-orders', { params: { day, line_code } }) as Promise<any[]>
 export const getNotifications = (user?: string) =>
   http.get('/mobile/notifications', { params: user ? { user } : {} }) as Promise<any>

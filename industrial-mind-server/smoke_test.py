@@ -38,23 +38,23 @@ results.append(check("box-types", client.get("/api/v1/meta/box-types")))
 results.append(check("materials", client.get("/api/v1/meta/materials")))
 results.append(check("login", client.post("/api/v1/auth/login", json={"username": "zhang", "password": "123456"})))
 results.append(check("dashboard", client.get("/api/v1/dashboard/overview"), ["kpi", "line_status", "capacity_chart"]))
-results.append(check("schedule", client.get("/api/v1/planning/schedule?line_code=QD-D&month=2026-08"), ["summary", "orders", "calendar"]))
-results.append(check("calendar", client.get("/api/v1/planning/calendar?line_code=QD-D&month=2026-08")))
-results.append(check("gantt", client.get("/api/v1/planning/gantt-data?line_code=QD-D&month=2026-08")))
-results.append(check("gantt-days", client.get("/api/v1/planning/gantt-days?line_code=QD-D&month=2026-08"), ["days", "orders", "daily_total"]))
-results.append(check("conflicts", client.get("/api/v1/planning/conflicts?line_code=QD-D&month=2026-08")))
-results.append(check("capacity", client.get("/api/v1/planning/capacity-summary?line_code=QD-D&month=2026-08"), ["plan_teu", "scheduled_teu"]))
+results.append(check("schedule", client.get("/api/v1/planning/schedule?line_code=PD-D&month=2026-08"), ["summary", "orders", "calendar"]))
+results.append(check("calendar", client.get("/api/v1/planning/calendar?line_code=PD-D&month=2026-08")))
+results.append(check("gantt", client.get("/api/v1/planning/gantt-data?line_code=PD-D&month=2026-08")))
+results.append(check("gantt-days", client.get("/api/v1/planning/gantt-days?line_code=PD-D&month=2026-08"), ["days", "orders", "daily_total"]))
+results.append(check("conflicts", client.get("/api/v1/planning/conflicts?line_code=PD-D&month=2026-08")))
+results.append(check("capacity", client.get("/api/v1/planning/capacity-summary?line_code=PD-D&month=2026-08"), ["plan_teu", "scheduled_teu"]))
 results.append(check("approval-list", client.get("/api/v1/approval/list?status=pending"), ["counts", "items"]))
 results.append(check("agents-diag", client.get("/api/v1/agents/diagnosis?device_id=WLD-R03")))
 results.append(check("agents-supply", client.get("/api/v1/agents/supply-chain")))
 results.append(check("agents-cost", client.get("/api/v1/agents/cost-analysis")))
 
 # 智能排产
-r = client.post("/api/v1/planning/smart", json={"line_code": "QD-D", "month": "2026-08", "apply": False})
+r = client.post("/api/v1/planning/smart", json={"line_code": "PD-D", "month": "2026-08", "apply": False})
 results.append(check("smart-plan", r, ["proposals", "summary"]))
-r = client.post("/api/v1/planning/smart", json={"line_code": "QD-D", "month": "2026-08", "apply": False, "work_order_no": "DFQD-2026-281-DS"})
+r = client.post("/api/v1/planning/smart", json={"line_code": "PD-D", "month": "2026-08", "apply": False, "work_order_no": "SHPD-2026-281-DS"})
 results.append(check("smart-single", r, ["proposals", "summary"]))
-r = client.post("/api/v1/planning/smart/adjust-analyze", json={"line_code": "QD-D", "work_order_no": "DFQD-2026-281-DS", "daily_schedule": [{"date": "2026-08-18", "qty": 40}, {"date": "2026-08-19", "qty": 40}]})
+r = client.post("/api/v1/planning/smart/adjust-analyze", json={"line_code": "PD-D", "work_order_no": "SHPD-2026-281-DS", "daily_schedule": [{"date": "2026-08-18", "qty": 40}, {"date": "2026-08-19", "qty": 40}]})
 results.append(check("smart-adjust-analyze", r, ["suggestions", "delivery_assess"]))
 
 # what-if（核心场景：40HC 1000台 9/30 上海）
@@ -89,16 +89,16 @@ r = client.post("/api/v1/mobile/quick-order/confirm", json={
 results.append(check("quick-order-confirm", r))
 
 results.append(check("my-orders", client.get("/api/v1/mobile/my-orders?user=张业务")))
-results.append(check("capacity-brief", client.get("/api/v1/mobile/capacity-brief?line_code=QD-D&month=2026-08")))
+results.append(check("capacity-brief", client.get("/api/v1/mobile/capacity-brief?line_code=PD-D&month=2026-08")))
 results.append(check("notifications", client.get("/api/v1/mobile/notifications?user=张业务")))
 results.append(check("mobile-approvals", client.get("/api/v1/mobile/approvals?status=pending")))
 
 # orchestrator chat（非流式）
-r = client.post("/api/v1/orchestrator/chat", json={"message": "9月份QD-D线还有多少空位", "source": "pc"})
+r = client.post("/api/v1/orchestrator/chat", json={"message": "9月份PD-D线还有多少空位", "source": "pc"})
 results.append(check("chat-capacity", r))
 print("  reply:", r.json().get("reply_text", "")[:80])
 
-r = client.post("/api/v1/orchestrator/chat", json={"message": "DFQD-2026-281-DS排到几号了", "source": "pc"})
+r = client.post("/api/v1/orchestrator/chat", json={"message": "SHPD-2026-281-DS排到几号了", "source": "pc"})
 results.append(check("chat-schedule", r))
 print("  reply:", r.json().get("reply_text", "")[:80])
 

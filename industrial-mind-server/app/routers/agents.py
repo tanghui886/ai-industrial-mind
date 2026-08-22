@@ -45,7 +45,7 @@ def quality(db: Session = Depends(get_db)):
         "spc": {"dimension": "箱体长度", "cl": "12192mm", "ucl": "+3mm", "lcl": "-3mm",
                 "cpk": 1.42, "trend": "stable"},
         "defects": [
-            {"type": "焊缝气孔", "count": 3, "root_cause": "送丝机构磨损（关联设备 DFQD 焊接#3）",
+            {"type": "焊缝气孔", "count": 3, "root_cause": "送丝机构磨损（关联设备 SHPD 焊接#3）",
              "cost": "材料浪费 ¥4,200", "action": "触发设备诊断 Agent 联查"},
             {"type": "漆面流挂", "count": 1, "root_cause": "喷涂粘度偏高（批次 P-2026-0812）",
              "cost": "返工工时 6h", "action": "调整粘度参数并锁定批次"},

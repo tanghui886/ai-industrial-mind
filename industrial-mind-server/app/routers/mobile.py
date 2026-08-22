@@ -43,7 +43,7 @@ async def quick_order(body: QuickOrderReq, _: str = Depends(require_perm("workor
             today = date.today()
             month = int(m.group(1)) if m else today.month
             year = today.year if month >= today.month else today.year + 1
-            cap = engine.capacity_summary(db, info.get("line_code") or "QD-D", year, month)
+            cap = engine.capacity_summary(db, info.get("line_code") or "PD-D", year, month)
         return {"intent": intent, "confidence": parsed.get("confidence", 0.8),
                 "message": "请按以下格式描述意向订单：箱型 + 数量 + 交付日期 + 交付地点，"
                            "例如「意向新订单，40HC箱型，总数量1000，计划2026.09.30交付，交付地点上海」",
@@ -51,7 +51,7 @@ async def quick_order(body: QuickOrderReq, _: str = Depends(require_perm("workor
 
     dd = date.fromisoformat(info["delivery_date"]) if info.get("delivery_date") else date.today() + timedelta(days=30)
     analysis = engine.feasibility_analysis(db, info["box_type"], info["quantity"], dd,
-                                           info.get("line_code") or "QD-D",
+                                           info.get("line_code") or "PD-D",
                                            info.get("delivery_location"))
     oi = analysis["order_info"]
     missing = [m for m in ["客户名称", "合同号", "接单属性", "内外贸属性"]
@@ -121,7 +121,7 @@ def my_orders(user: str = "张业务", db: Session = Depends(get_db)):
 
 
 @router.get("/capacity-brief")
-def capacity_brief(line_code: str = "QD-D", month: str = "2026-08", db: Session = Depends(get_db)):
+def capacity_brief(line_code: str = "PD-D", month: str = "2026-08", db: Session = Depends(get_db)):
     summary = engine.capacity_summary(db, line_code, int(month[:4]), int(month[5:7]))
     days = engine.daily_utilization(db, line_code, int(month[:4]), int(month[5:7]))
     summary["days"] = [{"date": d["date"], "day": d["day"], "is_workday": d["is_workday"],
@@ -133,7 +133,7 @@ def capacity_brief(line_code: str = "QD-D", month: str = "2026-08", db: Session 
 
 
 @router.get("/day-orders")
-def day_orders(day: str, line_code: str = "QD-D", db: Session = Depends(get_db)):
+def day_orders(day: str, line_code: str = "PD-D", db: Session = Depends(get_db)):
     """某日工令明细（移动端排产查看）"""
     rows = (db.query(ScheduleDaily)
             .filter(ScheduleDaily.line_code == line_code, ScheduleDaily.schedule_date == date.fromisoformat(day))

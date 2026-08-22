@@ -24,7 +24,7 @@ INTENT_SYSTEM_PROMPT = """你是一个集装箱制造企业的多智能体意图
 - general_chat: 其他——以上均不匹配的一般对话
 
 ## 抽取字段（针对所有意图，尽量抽取）
-- line_code: 产线编号（如 QD-D、SH-A、NT-A、NT-B、LYG-A）。从用户输入中识别产线，例如「QD-D线」「南通A线」「NH-A线」等；若输入明确提到某种产线写法，原样归一化为对应的标准编号；无法识别则为 null
+- line_code: 产线编号（如 PD-D、BS-A、JS-A、JS-B、FX-A）。从用户输入中识别产线，例如「PD-D线」「金山A线」「NH-A线」等；若输入明确提到某种产线写法，原样归一化为对应的标准编号；无法识别则为 null
 - work_order_no: 工令/工单号（若有）
 - box_type: 箱型（如40HC、20GP、Ener C+等）
 - quantity: 数量（台）

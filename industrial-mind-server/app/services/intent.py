@@ -31,11 +31,11 @@ BOX_PATTERNS: list[tuple[str, str]] = [
 LOCATIONS = ["上海", "青岛", "宁波", "天津", "深圳", "广州", "大连", "连云港",
              "南通", "启东", "南京", "厦门", "福州", "营口", "重庆", "武汉", "苏州", "杭州"]
 
-LINES = [("qd-d", "QD-D"), ("特箱线", "QD-D"), ("启东", "QD-D"),
-         ("sh-a", "SH-A"), ("上海", "SH-A"),
-         ("nt-a", "NT-A"), ("南通a", "NT-A"),
-         ("nt-b", "NT-B"), ("南通b", "NT-B"),
-         ("lyg-a", "LYG-A"), ("连云港", "LYG-A")]
+LINES = [("pd-d", "PD-D"), ("特箱线", "PD-D"), ("浦东", "PD-D"),
+         ("bs-a", "BS-A"), ("宝山", "BS-A"),
+         ("js-a", "JS-A"), ("金山a", "JS-A"),
+         ("js-b", "JS-B"), ("金山b", "JS-B"),
+         ("fx-a", "FX-A"), ("奉贤", "FX-A")]
 
 URGENT_WORDS = ["急", "加急", "紧急", "尽快", "马上"]
 
@@ -116,7 +116,7 @@ def _match_line(text: str) -> str | None:
     for kw, code in LINES:
         if kw in t:
             return code
-    # 通用产线编码识别：如 NH-A、QD-D、SH-A 等（即使不在已知产线表，也原样返回以便后续校验）
+    # 通用产线编码识别：如 NH-A、PD-D、SH-A 等（即使不在已知产线表，也原样返回以便后续校验）
     m = re.search(r"(?:^|[^a-z0-9])([a-z]{1,3})\s*-\s*([a-z])(?=[^a-z0-9]|$)", t)
     if m and m.group(1) not in ("ft", "hc", "gp", "os") and "产线" in t:
         return f"{m.group(1).upper()}-{m.group(2).upper()}"

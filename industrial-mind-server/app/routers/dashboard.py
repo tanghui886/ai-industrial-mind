@@ -12,16 +12,16 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 # 产线运行状态（设备实时数据，演示值）
 LINE_RUNTIME = {
-    "QD-D": {"status": "运行", "current_model": "SC-40HC（40ft 标准箱）", "plan": 42, "actual": 38},
-    "SH-A": {"status": "运行", "current_model": "RF-20RS（20ft 冷藏箱）", "plan": 28, "actual": 26},
-    "NT-A": {"status": "降速", "current_model": "OT-40OP（40ft 开顶箱）", "plan": 18, "actual": 14},
-    "NT-B": {"status": "检修", "current_model": "GP-20DV（20ft 干货箱）", "plan": 22, "actual": 0},
-    "LYG-A": {"status": "停机", "current_model": "HQ-40HC（40ft 高箱）", "plan": 30, "actual": 0},
+    "PD-D": {"status": "运行", "current_model": "SC-40HC（40ft 标准箱）", "plan": 42, "actual": 38},
+    "BS-A": {"status": "运行", "current_model": "RF-20RS（20ft 冷藏箱）", "plan": 28, "actual": 26},
+    "JS-A": {"status": "降速", "current_model": "OT-40OP（40ft 开顶箱）", "plan": 18, "actual": 14},
+    "JS-B": {"status": "检修", "current_model": "GP-20DV（20ft 干货箱）", "plan": 22, "actual": 0},
+    "FX-A": {"status": "停机", "current_model": "HQ-40HC（40ft 高箱）", "plan": 30, "actual": 0},
 }
 
 
 @router.get("/overview")
-def overview(line_code: str = "QD-D", db: Session = Depends(get_db)):
+def overview(line_code: str = "PD-D", db: Session = Depends(get_db)):
     today = date.today()
     lines = db.query(ProductionLine).all()
     line_status = []

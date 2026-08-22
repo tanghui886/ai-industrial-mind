@@ -12,6 +12,18 @@ export interface CmUser {
   phone?: string
 }
 
+/** 菜单节点：与后端 /auth 返回的 menu_tree 结构一致 */
+export interface CmMenu {
+  code: string
+  name: string
+  path?: string
+  parent_code?: string
+  icon?: string
+  sort_order?: number
+  admin_only?: boolean
+  children?: CmMenu[]
+}
+
 export function currentUser(): CmUser {
   try {
     return JSON.parse(localStorage.getItem('cm_user') || '{}')
@@ -37,6 +49,15 @@ export function currentMenus(): string[] {
   return []
 }
 
+/** 当前用户可见菜单树（登录/`/auth/me` 返回，存于 cm_menu_tree，用于动态渲染导航） */
+export function currentMenuTree(): CmMenu[] {
+  try {
+    const raw = localStorage.getItem('cm_menu_tree')
+    if (raw) return JSON.parse(raw)
+  } catch { /* ignore */ }
+  return []
+}
+
 export function isAdmin(): boolean {
   return currentUser().role === '管理员'
 }
@@ -55,11 +76,12 @@ export function hasPerm(...codes: string[]): boolean {
   return codes.some((c) => perms.includes(c))
 }
 
-/** 统一写入登录态：cm_user（用户信息）+ cm_perms（按钮权限）+ cm_menus（可见菜单） */
-export function persistAuth(data: { user?: CmUser; perms?: string[]; menus?: string[] }): void {
+/** 统一写入登录态：cm_user（用户信息）+ cm_perms（按钮权限）+ cm_menus（可见菜单）+ cm_menu_tree（菜单树） */
+export function persistAuth(data: { user?: CmUser; perms?: string[]; menus?: string[]; menu_tree?: CmMenu[] }): void {
   if (data.user) localStorage.setItem('cm_user', JSON.stringify(data.user))
   if (data.perms) localStorage.setItem('cm_perms', JSON.stringify(data.perms))
   if (data.menus) localStorage.setItem('cm_menus', JSON.stringify(data.menus))
+  if (data.menu_tree) localStorage.setItem('cm_menu_tree', JSON.stringify(data.menu_tree))
 }
 
 export function clearAuth(): void {
@@ -67,6 +89,7 @@ export function clearAuth(): void {
   localStorage.removeItem('cm_user')
   localStorage.removeItem('cm_perms')
   localStorage.removeItem('cm_menus')
+  localStorage.removeItem('cm_menu_tree')
 }
 
 // 用户角色 -> 权限组（与后端一致，用于展示/粗略分组）

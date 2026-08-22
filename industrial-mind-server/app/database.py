@@ -74,7 +74,7 @@ def _migrate():
     if insp.has_table("material"):
         cols = {c["name"] for c in insp.get_columns("material")}
         adds = {
-            "factory": "VARCHAR(16) DEFAULT 'DFQD'",
+            "factory": "VARCHAR(16) DEFAULT 'SHPD'",
             "unit": "VARCHAR(16) DEFAULT ''",
             "in_stock_units": "INTEGER DEFAULT 0",
             "order_deducted_units": "INTEGER DEFAULT 0",
@@ -94,3 +94,15 @@ def _migrate():
                 conn.execute(text("ALTER TABLE production_line ADD COLUMN storage_capacity INTEGER DEFAULT 0"))
             if "storage_units" not in cols:
                 conn.execute(text("ALTER TABLE production_line ADD COLUMN storage_units INTEGER DEFAULT 0"))
+
+    # menu 菜单定义表（可配置菜单树）：旧库无该表，create_all 已建，这里补齐种子数据
+    if insp.has_table("menu"):
+        from sqlalchemy.orm import Session as SASession
+        from .models import Menu
+
+        with SASession(bind=engine) as db:
+            if db.query(Menu).count() == 0:
+                from .permissions import DEFAULT_MENU_TREE
+                for row in DEFAULT_MENU_TREE:
+                    db.add(Menu(**row))
+                db.commit()

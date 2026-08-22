@@ -6,13 +6,13 @@ app:
   app_description: 集装箱制造业工业Agent协同系统 · 后端服务
   api_prefix: /api/v1
   host: 0.0.0.0
-  port: 8000
+  port: 8091
 
 # ============ 开发环境 ============
 dev:
   database: sqlite:///{base_dir}/data/containermind.db
   llm_base_url: https://api.deepseek.com
-  llm_api_key: ""
+  llm_api_key: "sk-9bbe818509844cfab1cff7518e31ac2c"
   llm_model: deepseek-v4-flash
 
 # ============ 集成测试环境 ============

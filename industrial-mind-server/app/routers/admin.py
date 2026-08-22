@@ -7,9 +7,9 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..models import Role, RoleMenu, RolePermission, User
-from ..permissions import (ADMIN_ROLE, MENU_DEFS, PERMISSION_DEFS, all_roles,
-                           require_perm, role_menus, role_perms)
+from ..models import Menu, Role, RoleMenu, RolePermission, User
+from ..permissions import (ADMIN_ROLE, PERMISSION_DEFS, all_roles,
+                           menu_defs, require_perm, role_menus, role_perms)
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -191,20 +191,28 @@ def delete_role(name: str, _: str = Depends(require_perm("role.manage")),
     return {"ok": True, "message": f"角色「{name}」已删除"}
 
 
-# ---------------- 菜单配置 ----------------
+# ---------------- 角色菜单配置（角色勾选可见菜单） ----------------
 
 class MenuSaveReq(BaseModel):
     role: str
     menus: list[str]
 
 
+def _selectable_menus(db: Session) -> list[dict]:
+    """返回可配置给角色的菜单定义（排除 admin_only 管理菜单）"""
+    return [d for d in menu_defs(db) if not d["admin_only"]]
+
+
 @router.get("/menus")
 def get_menus(_: str = Depends(require_perm("role.manage")), db: Session = Depends(get_db)):
     """返回菜单定义 + 各角色当前可见菜单配置（管理员拥有全部）"""
+    defs = menu_defs(db)
+    roles = all_roles(db)
     return {
-        "defs": [{"code": c, "name": n} for c, n in MENU_DEFS.items()],
-        "roles": all_roles(db),
-        "config": {r: sorted(role_menus(r, db)) for r in all_roles(db)},
+        "defs": [{"code": d["code"], "name": d["name"], "parent_code": d["parent_code"],
+                  "admin_only": d["admin_only"], "is_builtin": d["is_builtin"]} for d in defs],
+        "roles": roles,
+        "config": {r: sorted(role_menus(r, db)) for r in roles},
     }
 
 
@@ -214,7 +222,8 @@ def save_menus(body: MenuSaveReq, _: str = Depends(require_perm("role.manage")),
     _check_role(body.role, db)
     if body.role == ADMIN_ROLE:
         raise HTTPException(400, "管理员拥有全部菜单，无需配置")
-    invalid = [c for c in body.menus if c not in MENU_DEFS]
+    valid = {d["code"] for d in _selectable_menus(db)}
+    invalid = [c for c in body.menus if c not in valid]
     if invalid:
         raise HTTPException(400, f"非法菜单编码：{invalid}")
     db.query(RoleMenu).filter(RoleMenu.role == body.role).delete()
@@ -223,3 +232,81 @@ def save_menus(body: MenuSaveReq, _: str = Depends(require_perm("role.manage")),
     db.commit()
     return {"ok": True, "role": body.role, "menus": sorted(set(body.menus)),
             "message": f"角色「{body.role}」菜单已更新"}
+
+
+# ---------------- 菜单定义管理（菜单管理页 CRUD） ----------------
+
+class MenuDefIn(BaseModel):
+    code: str
+    name: str
+    path: str = ""
+    parent_code: str = ""
+    icon: str = ""
+    sort_order: int = 0
+    admin_only: bool = False
+
+
+def _check_parent(code: str, parent_code: str, db: Session):
+    if not parent_code:
+        return
+    if parent_code == code:
+        raise HTTPException(400, "父菜单不能是自身")
+    if not db.query(Menu).filter(Menu.code == parent_code).first():
+        raise HTTPException(400, f"父菜单「{parent_code}」不存在")
+
+
+@router.get("/menu-defs")
+def list_menu_defs(_: str = Depends(require_perm("menu.manage")), db: Session = Depends(get_db)):
+    """返回全部菜单定义（含层级字段），供「菜单管理」页面维护"""
+    return menu_defs(db)
+
+
+@router.post("/menu-defs")
+def create_menu_def(body: MenuDefIn, _: str = Depends(require_perm("menu.manage")),
+                    db: Session = Depends(get_db)):
+    code = body.code.strip()
+    if not code:
+        raise HTTPException(400, "菜单编码不能为空")
+    if db.query(Menu).filter(Menu.code == code).first():
+        raise HTTPException(400, f"菜单编码「{code}」已存在")
+    _check_parent(code, body.parent_code.strip(), db)
+    db.add(Menu(code=code, name=body.name.strip() or code, path=body.path.strip(),
+                parent_code=body.parent_code.strip(), icon=body.icon.strip(),
+                sort_order=body.sort_order, admin_only=body.admin_only, is_builtin=False))
+    db.commit()
+    return {"ok": True, "message": f"菜单「{body.name or code}」已创建"}
+
+
+@router.put("/menu-defs/{code}")
+def update_menu_def(code: str, body: MenuDefIn, _: str = Depends(require_perm("menu.manage")),
+                    db: Session = Depends(get_db)):
+    menu = db.query(Menu).filter(Menu.code == code).first()
+    if not menu:
+        raise HTTPException(404, f"菜单「{code}」不存在")
+    if body.code.strip() != code:
+        raise HTTPException(400, "菜单编码作为关联键不可修改")
+    _check_parent(code, body.parent_code.strip(), db)
+    menu.name = body.name.strip() or code
+    menu.path = body.path.strip()
+    menu.parent_code = body.parent_code.strip()
+    menu.icon = body.icon.strip()
+    menu.sort_order = body.sort_order
+    menu.admin_only = body.admin_only
+    db.commit()
+    return {"ok": True, "message": f"菜单「{menu.name}」已更新"}
+
+
+@router.delete("/menu-defs/{code}")
+def delete_menu_def(code: str, _: str = Depends(require_perm("menu.manage")),
+                    db: Session = Depends(get_db)):
+    menu = db.query(Menu).filter(Menu.code == code).first()
+    if not menu:
+        raise HTTPException(404, f"菜单「{code}」不存在")
+    if menu.is_builtin:
+        raise HTTPException(400, f"内置菜单「{menu.name}」不可删除")
+    if db.query(Menu).filter(Menu.parent_code == code).first():
+        raise HTTPException(400, f"菜单「{menu.name}」下仍有子菜单，请先删除子菜单")
+    db.query(RoleMenu).filter(RoleMenu.menu_code == code).delete()
+    db.delete(menu)
+    db.commit()
+    return {"ok": True, "message": f"菜单「{menu.name}」已删除"}

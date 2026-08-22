@@ -42,7 +42,7 @@ class Settings:
     # 大模型（可选）：OpenAI 兼容协议；未配置时使用内置规则引擎
     LLM_BASE_URL: str = _config.get("llm_base_url", "https://api.deepseek.com/v1")
     LLM_API_KEY: str = _config.get("llm_api_key", "")
-    LLM_MODEL: str = _config.get("llm_model", "deepseek-v4-flash-0731")
+    LLM_MODEL: str = _config.get("llm_model", "deepseek-v4-flash")
 
     @property
     def LLM_ENABLED(self) -> bool:

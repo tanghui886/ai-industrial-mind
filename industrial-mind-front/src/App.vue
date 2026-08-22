@@ -9,7 +9,7 @@ onMounted(async () => {
   if (!localStorage.getItem('cm_token')) return
   try {
     const data = await authMe()
-    persistAuth({ user: data, perms: data.perms, menus: data.menus })
+    persistAuth({ user: data, perms: data.perms, menus: data.menus, menu_tree: data.menu_tree })
   } catch { /* 后端未就绪时忽略，保持本地登录态 */ }
 })
 </script>

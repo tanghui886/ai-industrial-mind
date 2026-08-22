@@ -1,48 +1,32 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Container, CalendarDays, BotMessageSquare, ClipboardCheck, LayoutDashboard, Factory, LogOut, Users, ShieldCheck, Boxes, UserCog, Cpu, BadgeDollarSign, ChevronDown, Warehouse } from 'lucide-vue-next'
+import { Container, LogOut, ChevronDown, Circle } from 'lucide-vue-next'
+import * as Icons from 'lucide-vue-next'
 import { authMe } from '@/api'
-import { currentUser, persistAuth, clearAuth, isAdmin, hasMenu } from '@/utils/permission'
+import { currentMenuTree, currentUser, persistAuth, clearAuth } from '@/utils/permission'
+import type { CmMenu } from '@/utils/permission'
 
 const route = useRoute()
 const router = useRouter()
-const factory = ref('QD-D')
-const admin = ref(isAdmin())
+const factory = ref('PD-D')
 
-const navs = computed(() => {
-  const all: any[] = [
-    { path: '/pc/dashboard', label: '产线总览', icon: LayoutDashboard, menu: 'dashboard' },
-    { path: '/pc/planning', label: '排产工作台', icon: CalendarDays, menu: 'planning' },
-    { path: '/pc/agent', label: 'Agent 对话台', icon: BotMessageSquare, menu: 'agent' },
-    { path: '/pc/approval', label: '审批工作台', icon: ClipboardCheck, menu: 'approval' },
-    { path: '/pc/material', label: '物料维护', icon: Boxes, menu: 'material' },
-    { path: '/pc/storage', label: '堆存管理', icon: Warehouse, menu: 'storage' },
-    { label: '设备', icon: Cpu, menu: 'device', children: [
-      { path: '/pc/device', label: '设备大屏' },
-      { path: '/pc/device-manage', label: '设备管理' },
-    ] },
-    { label: '成本', icon: BadgeDollarSign, menu: 'cost', children: [
-      { path: '/pc/cost', label: '成本动因大屏' },
-      { path: '/pc/cost-manage', label: '各维度数据管理' },
-      { path: '/pc/cost-baseline', label: '基准配置' },
-      { path: '/pc/cost-analyze', label: '成本动因分析' },
-      { path: '/pc/cost-records', label: '分析明细' },
-      { path: '/pc/cost-material-detail', label: '物料明细' },
-    ] },
-    { path: '/pc/users', label: '用户管理', icon: Users, menu: 'user', admin: true },
-    { path: '/pc/permissions', label: '权限管理', icon: ShieldCheck, menu: 'perm', admin: true },
-    { path: '/pc/roles', label: '角色管理', icon: UserCog, menu: 'role', admin: true },
-    { path: '/pc/llm-log', label: '模型调用记录', icon: BotMessageSquare, menu: 'llm-log', admin: true },
-  ]
-  return all.filter((n) => {
-    if (n.admin) return admin.value
-    return hasMenu(n.menu)
-  })
-})
+/** 由后端返回的 menu_tree 动态渲染导航（按角色配置，无需前端硬编码） */
+const navs = computed(() => currentMenuTree().map(mapNode))
+
+function mapNode(n: CmMenu): any {
+  const icon = (Icons as any)[n.icon] || Circle
+  return {
+    code: n.code,
+    label: n.name,
+    path: n.path,
+    icon,
+    children: (n.children ?? []).map(mapNode),
+  }
+}
 
 function isActive(n: any): boolean {
-  if (n.children) return n.children.some((c: any) => route.path === c.path)
+  if (n.children && n.children.length) return n.children.some((c: any) => route.path === c.path)
   return route.path === n.path
 }
 
@@ -51,13 +35,12 @@ function logout() {
   router.push('/login')
 }
 
-// 刷新登录信息 + 按钮权限 + 菜单
+// 刷新登录信息 + 按钮权限 + 菜单树
 onMounted(async () => {
   if (!localStorage.getItem('cm_token')) return
   try {
     const data = await authMe()
-    persistAuth({ user: data, perms: data.perms, menus: data.menus })
-    admin.value = isAdmin()
+    persistAuth({ user: data, perms: data.perms, menus: data.menus, menu_tree: data.menu_tree })
   } catch { /* 忽略 */ }
 })
 </script>
@@ -73,7 +56,7 @@ onMounted(async () => {
         <nav class="cm-nav" aria-label="全局导航">
           <template v-for="n in navs" :key="n.label || n.path">
             <!-- 分组菜单（二级菜单） -->
-            <div v-if="n.children" class="nav-group" :class="{ active: isActive(n) }">
+            <div v-if="n.children && n.children.length" class="nav-group" :class="{ active: isActive(n) }">
               <a class="nav-group-trigger" @click.prevent="router.push(n.children[0].path)">
                 <component :is="n.icon" :size="15" />
                 <span>{{ n.label }}</span>
@@ -95,16 +78,6 @@ onMounted(async () => {
         </nav>
       </div>
       <div class="cm-topbar-end">
-        <!--<div class="cm-factory-select">
-          <Factory :size="15" class="text-muted" />
-          <select v-model="factory" aria-label="产线选择">
-            <option value="QD-D">启东工厂 QD-D（特箱线）</option>
-            <option value="SH-A">上海工厂 SH-A</option>
-            <option value="NT-A">南通工厂 NT-A</option>
-            <option value="NT-B">南通工厂 NT-B</option>
-            <option value="LYG-A">连云港工厂 LYG-A</option>
-          </select>
-        </div>-->
         <div class="cm-user">
           <div class="user-meta">
             <div class="user-name">{{ currentUser().display_name || '未登录' }}</div>

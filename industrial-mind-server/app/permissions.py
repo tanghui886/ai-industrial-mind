@@ -9,7 +9,7 @@ from fastapi import Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
 from .database import get_db
-from .models import RoleMenu, RolePermission, User
+from .models import Menu, RoleMenu, RolePermission, User
 
 # 按钮权限定义：perm_code -> 中文名（管理端展示 + 默认授权）
 PERMISSION_DEFS: dict[str, str] = {
@@ -26,22 +26,66 @@ PERMISSION_DEFS: dict[str, str] = {
     "user.manage": "用户管理",
     "perm.manage": "权限管理",
     "role.manage": "角色管理",
+    "menu.manage": "菜单管理",
 }
 
-# 菜单定义：menu_code -> 中文名（角色可配置可见菜单）
-MENU_DEFS: dict[str, str] = {
-    "dashboard": "产线总览",
-    "planning": "排产工作台",
-    "agent": "Agent 对话台",
-    "approval": "审批工作台",
-    "material": "物料维护",
-    "device": "设备管理",
-    "storage": "堆存管理",
-    "cost": "成本动因",
-    "user": "用户管理",
-    "perm": "权限管理",
-    "role": "角色管理",
-}
+# 默认菜单树定义（种子数据）：前端导航据此渲染，管理员可在「菜单管理」维护
+DEFAULT_MENU_TREE: list[dict] = [
+    # 顶级菜单
+    {"code": "dashboard", "name": "产线总览", "path": "/pc/dashboard", "parent_code": "",
+     "icon": "LayoutDashboard", "sort_order": 10, "admin_only": False, "is_builtin": True},
+    {"code": "agent", "name": "Agent 对话台", "path": "/pc/agent", "parent_code": "",
+     "icon": "BotMessageSquare", "sort_order": 20, "admin_only": False, "is_builtin": True},
+    {"code": "planning", "name": "排产工作台", "path": "/pc/planning", "parent_code": "",
+     "icon": "CalendarDays", "sort_order": 30, "admin_only": False, "is_builtin": True},
+    {"code": "approval", "name": "审批工作台", "path": "/pc/approval", "parent_code": "",
+     "icon": "ClipboardCheck", "sort_order": 40, "admin_only": False, "is_builtin": True},
+    # 物料管理（分组）
+    {"code": "box", "name": "物料管理", "path": "", "parent_code": "",
+     "icon": "Boxes", "sort_order": 50, "admin_only": False, "is_builtin": True},
+    {"code": "material", "name": "物料维护", "path": "/pc/material", "parent_code": "box",
+     "icon": "Boxes", "sort_order": 51, "admin_only": False, "is_builtin": True},
+    {"code": "supplier", "name": "供货商动态", "path": "/pc/supplier", "parent_code": "box",
+     "icon": "BadgeMinus", "sort_order": 52, "admin_only": False, "is_builtin": True},
+    # 堆存管理
+    {"code": "storage", "name": "堆存管理", "path": "/pc/storage", "parent_code": "",
+     "icon": "Warehouse", "sort_order": 60, "admin_only": False, "is_builtin": True},
+    # 设备管理（分组）
+    {"code": "device", "name": "设备管理", "path": "", "parent_code": "",
+     "icon": "Cpu", "sort_order": 70, "admin_only": False, "is_builtin": True},
+    {"code": "device-screen", "name": "设备大屏", "path": "/pc/device", "parent_code": "device",
+     "icon": "Cpu", "sort_order": 71, "admin_only": False, "is_builtin": True},
+    {"code": "device-manage", "name": "设备明细", "path": "/pc/device-manage", "parent_code": "device",
+     "icon": "Cpu", "sort_order": 72, "admin_only": False, "is_builtin": True},
+    # 成本管理（分组）
+    {"code": "cost", "name": "成本管理", "path": "", "parent_code": "",
+     "icon": "BadgeDollarSign", "sort_order": 80, "admin_only": False, "is_builtin": True},
+    {"code": "cost-screen", "name": "成本动因大屏", "path": "/pc/cost", "parent_code": "cost",
+     "icon": "BadgeDollarSign", "sort_order": 81, "admin_only": False, "is_builtin": True},
+    {"code": "cost-manage", "name": "各维度数据管理", "path": "/pc/cost-manage", "parent_code": "cost",
+     "icon": "BadgeDollarSign", "sort_order": 82, "admin_only": False, "is_builtin": True},
+    {"code": "cost-baseline", "name": "基准配置", "path": "/pc/cost-baseline", "parent_code": "cost",
+     "icon": "BadgeDollarSign", "sort_order": 83, "admin_only": False, "is_builtin": True},
+    {"code": "cost-analyze", "name": "成本动因分析", "path": "/pc/cost-analyze", "parent_code": "cost",
+     "icon": "BadgeDollarSign", "sort_order": 84, "admin_only": False, "is_builtin": True},
+    {"code": "cost-records", "name": "分析明细", "path": "/pc/cost-records", "parent_code": "cost",
+     "icon": "BadgeDollarSign", "sort_order": 85, "admin_only": False, "is_builtin": True},
+    {"code": "cost-material-detail", "name": "物料明细", "path": "/pc/cost-material-detail", "parent_code": "cost",
+     "icon": "BadgeDollarSign", "sort_order": 86, "admin_only": False, "is_builtin": True},
+    # 系统设置（分组，仅管理员）
+    {"code": "setting", "name": "系统设置", "path": "", "parent_code": "",
+     "icon": "Settings", "sort_order": 90, "admin_only": True, "is_builtin": True},
+    {"code": "user", "name": "用户管理", "path": "/pc/users", "parent_code": "setting",
+     "icon": "Users", "sort_order": 91, "admin_only": True, "is_builtin": True},
+    {"code": "perm", "name": "权限管理", "path": "/pc/permissions", "parent_code": "setting",
+     "icon": "ShieldCheck", "sort_order": 92, "admin_only": True, "is_builtin": True},
+    {"code": "role", "name": "角色管理", "path": "/pc/roles", "parent_code": "setting",
+     "icon": "UserCog", "sort_order": 93, "admin_only": True, "is_builtin": True},
+    {"code": "llm-log", "name": "模型调用记录", "path": "/pc/llm-log", "parent_code": "setting",
+     "icon": "BotMessageSquare", "sort_order": 94, "admin_only": True, "is_builtin": True},
+    {"code": "menu", "name": "菜单管理", "path": "/pc/menu-manage", "parent_code": "setting",
+     "icon": "ListTree", "sort_order": 95, "admin_only": True, "is_builtin": True},
+]
 
 # 角色 -> 默认按钮权限（角色尚未配置任何权限时兜底）
 DEFAULT_PERMS: dict[str, list[str]] = {
@@ -57,7 +101,7 @@ DEFAULT_PERMS: dict[str, list[str]] = {
 
 # 角色 -> 默认可见菜单（角色尚未配置任何菜单时兜底）
 DEFAULT_MENUS: dict[str, list[str]] = {
-    "管理员": list(MENU_DEFS),
+    "管理员": [d["code"] for d in DEFAULT_MENU_TREE],
     "业务经理": ["dashboard", "planning", "agent", "approval", "storage"],
     "计划员": ["dashboard", "planning", "agent", "approval", "storage"],
     "生产主管": ["dashboard", "approval", "storage"],
@@ -117,10 +161,76 @@ def role_perms(role: str, db: Session) -> set[str]:
     return set(DEFAULT_PERMS.get(role, []))
 
 
+def menu_defs(db: Session) -> list[dict]:
+    """返回全部菜单定义（含层级字段），供「菜单管理」页面维护；DB 为空时回退种子数据"""
+    rows = db.query(Menu).order_by(Menu.sort_order, Menu.id).all()
+    if rows:
+        return [_menu_dict(m) for m in rows]
+    return [{**d} for d in DEFAULT_MENU_TREE]
+
+
+def _menu_dict(m) -> dict:
+    return {
+        "code": m.code,
+        "name": m.name,
+        "path": m.path,
+        "parent_code": m.parent_code,
+        "icon": m.icon,
+        "sort_order": m.sort_order,
+        "admin_only": m.admin_only,
+        "is_builtin": m.is_builtin,
+    }
+
+
+def build_menu_tree(defs: list[dict], codes: set[str] | None = None) -> list[dict]:
+    """根据菜单定义与可见编码集合构建菜单树（含 children，按 sort_order 排序）。
+    - codes 为空表示全部可见
+    - 父子关系通过 parent_code 关联；父节点即使不在 codes 中，只要有可见子节点也会保留
+    """
+    by_code: dict[str, dict] = {d["code"]: {**d, "children": []} for d in defs}
+    roots: list[dict] = []
+    for d in defs:
+        node = by_code[d["code"]]
+        parent = by_code.get(d["parent_code"])
+        if parent is not None and parent is not node:
+            parent["children"].append(node)
+        else:
+            roots.append(node)
+
+    def _sort(nodes: list[dict]):
+        nodes.sort(key=lambda n: (n["sort_order"], n["code"]))
+        for n in nodes:
+            _sort(n["children"])
+
+    _sort(roots)
+
+    if codes is not None:
+        def _filter(nodes: list[dict]) -> list[dict]:
+            kept = []
+            for n in nodes:
+                n["children"] = _filter(n["children"])
+                if n["code"] in codes or n["children"]:
+                    kept.append(n)
+            return kept
+        roots = _filter(roots)
+    return roots
+
+
+def role_menu_tree(role: str, db: Session) -> list[dict]:
+    """返回角色可见的菜单树（含层级），供前端动态渲染导航；管理员拥有全部（含 admin_only）"""
+    defs = menu_defs(db)
+    if role == ADMIN_ROLE:
+        return build_menu_tree(defs)
+    codes = set(role_menus(role, db))
+    # 非管理员不可见 admin_only 菜单（如系统设置下的管理菜单）
+    codes &= {d["code"] for d in defs if not d["admin_only"]}
+    return build_menu_tree(defs, codes)
+
+
 def role_menus(role: str, db: Session) -> list[str]:
     """返回角色可见菜单编码列表；管理员拥有全部；未配置时回退默认值"""
     if role == ADMIN_ROLE:
-        return list(MENU_DEFS)
+        return [d["code"] for d in menu_defs(db)]
     rows = db.query(RoleMenu).filter(RoleMenu.role == role).all()
     if rows:
         return [r.menu_code for r in rows]

@@ -21,7 +21,7 @@ STATUS_CN = {"draft": "草稿", "pending_approval": "待审批", "confirmed": "�
              "cancelled": "已取消", "completed": "已完成"}
 
 # 产线 -> 所属工厂代码
-LINE_FACTORY = {"QD-D": "DFQD", "SH-A": "DFSH", "NT-A": "DFNT", "NT-B": "DFNT", "LYG-A": "DFLYG"}
+LINE_FACTORY = {"PD-D": "SHPD", "BS-A": "SHBS", "JS-A": "SHJS", "JS-B": "SHJS", "FX-A": "SHFX"}
 
 
 def _plan_dict(p: SchedulePlan, with_daily: bool = False) -> dict:
@@ -47,7 +47,7 @@ def _plan_dict(p: SchedulePlan, with_daily: bool = False) -> dict:
 
 
 @router.get("/schedule")
-def get_schedule(line_code: str = "QD-D", month: str = "2026-08",
+def get_schedule(line_code: str = "PD-D", month: str = "2026-08",
                  group: str = Depends(get_current_group), db: Session = Depends(get_db)):
     year, mon = int(month[:4]), int(month[5:7])
     orders = (db.query(SchedulePlan)
@@ -80,7 +80,7 @@ def get_schedule(line_code: str = "QD-D", month: str = "2026-08",
 
 class WorkOrderIn(BaseModel):
     work_order_no: str
-    line_code: str = "QD-D"
+    line_code: str = "PD-D"
     customer: str
     box_type: str
     quantity: int
@@ -103,7 +103,7 @@ class WorkOrderIn(BaseModel):
 
 def _gen_work_order_no(db: Session, line_code: str) -> str:
     """按产线对应工厂生成工令号：{工厂}-2026-{序号:03d}-DS"""
-    factory = LINE_FACTORY.get(line_code, "DFQD")
+    factory = LINE_FACTORY.get(line_code, "SHPD")
     prefix = f"{factory}-2026-"
     n = 305 + db.query(SchedulePlan).filter(SchedulePlan.work_order_no.like(f"{prefix}%")).count()
     return f"{prefix}{n:03d}-DS"
@@ -128,7 +128,7 @@ def create_order(body: WorkOrderIn, _: str = Depends(require_perm("workorder.add
     wo = body.work_order_no or _gen_work_order_no(db, body.line_code)
     plan = SchedulePlan(
         plan_id=f"PLAN-{uuid.uuid4().hex[:12]}", plan_month=f"{s.year:04d}-{s.month:02d}",
-        factory_code=LINE_FACTORY.get(body.line_code, "DFQD"), line_code=body.line_code, work_order_no=wo,
+        factory_code=LINE_FACTORY.get(body.line_code, "SHPD"), line_code=body.line_code, work_order_no=wo,
         order_confirm_no=body.order_confirm_no, contract_no=body.contract_no,
         customer=body.customer, box_type=body.box_type, quantity=body.quantity,
         teu=int(body.quantity * float(box.teu_factor)),
@@ -254,7 +254,7 @@ def confirm_order(plan_id: int, operator: str = "李计划",
 
 
 @router.get("/conflicts")
-def conflicts(line_code: str = "QD-D", month: str = "2026-08", db: Session = Depends(get_db)):
+def conflicts(line_code: str = "PD-D", month: str = "2026-08", db: Session = Depends(get_db)):
     year, mon = int(month[:4]), int(month[5:7])
     days = engine.daily_utilization(db, line_code, year, mon)
     return [{"date": d["date"], "utilization": d["utilization"], "booked_teu": d["booked_teu"],
@@ -262,7 +262,7 @@ def conflicts(line_code: str = "QD-D", month: str = "2026-08", db: Session = Dep
 
 
 @router.get("/gantt-data")
-def gantt_data(line_code: str = "QD-D", month: str = "2026-08",
+def gantt_data(line_code: str = "PD-D", month: str = "2026-08",
                group: str = Depends(get_current_group), db: Session = Depends(get_db)):
     orders = (db.query(SchedulePlan)
               .filter(SchedulePlan.line_code == line_code, SchedulePlan.plan_month == month,
@@ -281,7 +281,7 @@ def gantt_data(line_code: str = "QD-D", month: str = "2026-08",
 
 
 @router.get("/calendar")
-def get_calendar(line_code: str = "QD-D", month: str = "2026-08", db: Session = Depends(get_db)):
+def get_calendar(line_code: str = "PD-D", month: str = "2026-08", db: Session = Depends(get_db)):
     year, mon = int(month[:4]), int(month[5:7])
     days = engine.daily_utilization(db, line_code, year, mon)
     return [{"date": d["date"], "day": d["day"], "is_workday": d["is_workday"],
@@ -350,13 +350,13 @@ def update_calendar_batch(line_code: str, body: list[CalendarBatchItem],
 
 
 @router.get("/capacity-summary")
-def capacity(line_code: str = "QD-D", month: str = "2026-08", db: Session = Depends(get_db)):
+def capacity(line_code: str = "PD-D", month: str = "2026-08", db: Session = Depends(get_db)):
     return engine.capacity_summary(db, line_code, int(month[:4]), int(month[5:7]))
 
 
 # ---------- 甘特按天矩阵（按天统计，支持手工输入每日产能） ----------
 @router.get("/gantt-days")
-def gantt_days(line_code: str = "QD-D", month: str = "2026-08",
+def gantt_days(line_code: str = "PD-D", month: str = "2026-08",
                group: str = Depends(get_current_group), db: Session = Depends(get_db)):
     """返回当月每天明细 + 每个工令的按日排产量矩阵 + 每日产能合计"""
     year, mon = int(month[:4]), int(month[5:7])
@@ -410,7 +410,7 @@ class GanttDailyItem(BaseModel):
 
 
 @router.post("/gantt-days")
-def save_gantt_days(line_code: str = "QD-D", items: list[GanttDailyItem] = None,
+def save_gantt_days(line_code: str = "PD-D", items: list[GanttDailyItem] = None,
                     _: str = Depends(require_perm("planning.schedule")),
                     db: Session = Depends(get_db)):
     """保存甘特按天矩阵：逐工令落库每日排产量（0 表示清除该日）。
@@ -479,7 +479,7 @@ def save_gantt_days(line_code: str = "QD-D", items: list[GanttDailyItem] = None,
 
 
 class SmartPlanReq(BaseModel):
-    line_code: str = "QD-D"
+    line_code: str = "PD-D"
     month: str = "2026-08"
     apply: bool = False
     operator: str = "李计划"
@@ -508,7 +508,7 @@ def smart(body: SmartPlanReq, perms: set[str] | None = Depends(get_current_perms
 
 
 class AdjustAnalyzeReq(BaseModel):
-    line_code: str = "QD-D"
+    line_code: str = "PD-D"
     work_order_no: str
     daily_schedule: list[dict] = []           # [{"date": "2026-08-12", "qty": 80}, ...]
     delivery_date: str | None = None
@@ -526,7 +526,7 @@ class WhatIfReq(BaseModel):
     quantity: int
     delivery_date: str | None = None
     delivery_location: str | None = None
-    line_code: str = "QD-D"
+    line_code: str = "PD-D"
 
 
 @router.post("/what-if")
@@ -537,7 +537,7 @@ def what_if(body: WhatIfReq, db: Session = Depends(get_db)):
 
 
 @router.get("/version-history")
-def version_history(line_code: str = "QD-D", month: str = "2026-08", db: Session = Depends(get_db)):
+def version_history(line_code: str = "PD-D", month: str = "2026-08", db: Session = Depends(get_db)):
     orders = (db.query(SchedulePlan)
               .filter(SchedulePlan.line_code == line_code, SchedulePlan.plan_month == month).all())
     return [{"work_order_no": o.work_order_no, "version": o.version, "status": o.status,

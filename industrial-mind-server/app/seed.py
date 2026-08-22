@@ -12,14 +12,14 @@ from .models import (Alert, Approval, BoxType, Device, Factory,
 from .permissions import DEFAULT_PERMS
 
 FACTORIES = [
-    ("DFQD", "启东工厂"), ("DFSH", "上海工厂"), ("DFNT", "南通工厂"), ("DFLYG", "连云港工厂"),
+    ("SHPD", "浦东工厂"), ("SHBS", "宝山工厂"), ("SHJS", "金山工厂"), ("SHFX", "奉贤工厂"),
 ]
 LINES = [
-    ("QD-D", "启东D线（特箱线）", "DFQD", "特种箱", 180, 600, 320),
-    ("SH-A", "上海A线", "DFSH", "标准箱", 260, 800, 450),
-    ("NT-A", "南通A线", "DFNT", "标准箱", 260, 800, 380),
-    ("NT-B", "南通B线", "DFNT", "标准箱", 240, 750, 410),
-    ("LYG-A", "连云港A线", "DFLYG", "标准箱", 240, 700, 360),
+    ("PD-D", "浦东D线（特箱线）", "SHPD", "特种箱", 180, 600, 320),
+    ("BS-A", "宝山A线", "SHBS", "标准箱", 260, 800, 450),
+    ("JS-A", "金山A线", "SHJS", "标准箱", 260, 800, 380),
+    ("JS-B", "金山B线", "SHJS", "标准箱", 240, 750, 410),
+    ("FX-A", "奉贤A线", "SHFX", "标准箱", 240, 700, 360),
 ]
 # code, name, category, min, max, std, teu, cteu
 BOX_TYPES = [
@@ -52,93 +52,93 @@ BOX_TYPES = [
     ("岸电箱", "20'岸电箱", "储能箱系列", 35, 50, 42, 1.0, 1.3),
 ]
 
-# QD-D 2026-08 工令（对齐设计稿排产工作台示例 + 铺量数据）
+# PD-D 2026-08 工令（对齐设计稿排产工作台示例 + 铺量数据）
 # (工令号, 客户, 箱型, 数量, 开始, 结束, 状态, 类型, 交付地, 备注)
 AUG_ORDERS = [
-    ("DFQD-2026-268-DS", "航天科工", "液冷方舱", 28, "2026-08-26", "2026-08-31", "confirmed", "批量", "武汉", ""),
-    ("DFQD-2026-269-DS", "江苏气瓶", "40气瓶箱", 40, "2026-08-24", "2026-08-28", "confirmed", "批量", "南京", ""),
-    ("DFQD-2026-270-DS", "中远海运", "20GP", 10, "2026-08-24", "2026-08-24", "confirmed", "样箱", "上海", "客户验样"),
-    ("DFQD-2026-271-DS", "东方国际", "20GP", 240, "2026-08-03", "2026-08-07", "completed", "批量", "上海", ""),
-    ("DFQD-2026-272-DS", "中远海运", "40HC", 180, "2026-08-03", "2026-08-10", "completed", "批量", "上海", ""),
-    ("DFQD-2026-273-DS", "Seaco", "20OS", 120, "2026-08-03", "2026-08-07", "completed", "批量", "宁波", ""),
-    ("DFQD-2026-274-DS", "Triton", "40GP", 120, "2026-08-10", "2026-08-14", "confirmed", "批量", "青岛", ""),
-    ("DFQD-2026-275-DS", "Enercore", "Ener D", 50, "2026-08-13", "2026-08-14", "confirmed", "小批量", "上海", ""),
-    ("DFQD-2026-276-DS", "中建集成", "房屋箱", 24, "2026-08-13", "2026-08-17", "confirmed", "批量", "启东", ""),
-    ("DFQD-2026-277-DS", "宁德时代", "20储能箱", 84, "2026-08-13", "2026-08-17", "confirmed", "批量", "宁德", "含Pack预装"),
-    ("DFQD-2026-S01-DS", "东方国际", "20GP", 20, "2026-08-06", "2026-08-06", "confirmed", "样箱", "上海", "现场插单样箱"),
-    ("DFQD-2026-278-DS", "阳光电源", "光伏平板", 60, "2026-08-18", "2026-08-25", "confirmed", "批量", "合肥", ""),
-    ("DFQD-2026-279-DS", "东方外贸", "40HC", 90, "2026-08-19", "2026-08-21", "confirmed", "小批量", "上海", ""),
-    ("DFQD-2026-280-DS", "华东储能", "20储能箱", 56, "2026-08-20", "2026-08-21", "confirmed", "批量", "上海", ""),
-    ("DFQD-2026-281-DS", "中远海运", "40HC", 120, "2026-08-03", "2026-08-12", "confirmed", "批量", "上海", ""),
-    ("DFQD-2026-282-DS", "马士基", "Ener C+", 80, "2026-08-10", "2026-08-17", "draft", "批量", "上海", "AI建议提前2天避开物料缺口"),
-    ("DFQD-2026-283-DS", "MSC", "20GP", 200, "2026-08-17", "2026-08-24", "pending_approval", "批量", "宁波", ""),
-    ("DFQD-2026-284-DS", "达飞轮船", "40HC", 150, "2026-08-20", "2026-08-28", "draft", "批量", "上海", ""),
+    ("SHPD-2026-268-DS", "航天科工", "液冷方舱", 28, "2026-08-26", "2026-08-31", "confirmed", "批量", "武汉", ""),
+    ("SHPD-2026-269-DS", "江苏气瓶", "40气瓶箱", 40, "2026-08-24", "2026-08-28", "confirmed", "批量", "南京", ""),
+    ("SHPD-2026-270-DS", "中远海运", "20GP", 10, "2026-08-24", "2026-08-24", "confirmed", "样箱", "宝山", "客户验样"),
+    ("SHPD-2026-271-DS", "东方国际", "20GP", 240, "2026-08-03", "2026-08-07", "completed", "批量", "宝山", ""),
+    ("SHPD-2026-272-DS", "中远海运", "40HC", 180, "2026-08-03", "2026-08-10", "completed", "批量", "宝山", ""),
+    ("SHPD-2026-273-DS", "Seaco", "20OS", 120, "2026-08-03", "2026-08-07", "completed", "批量", "宁波", ""),
+    ("SHPD-2026-274-DS", "Triton", "40GP", 120, "2026-08-10", "2026-08-14", "confirmed", "批量", "青岛", ""),
+    ("SHPD-2026-275-DS", "Enercore", "Ener D", 50, "2026-08-13", "2026-08-14", "confirmed", "小批量", "宝山", ""),
+    ("SHPD-2026-276-DS", "中建集成", "房屋箱", 24, "2026-08-13", "2026-08-17", "confirmed", "批量", "浦东", ""),
+    ("SHPD-2026-277-DS", "宁德时代", "20储能箱", 84, "2026-08-13", "2026-08-17", "confirmed", "批量", "宁德", "含Pack预装"),
+    ("SHPD-2026-S01-DS", "东方国际", "20GP", 20, "2026-08-06", "2026-08-06", "confirmed", "样箱", "宝山", "现场插单样箱"),
+    ("SHPD-2026-278-DS", "阳光电源", "光伏平板", 60, "2026-08-18", "2026-08-25", "confirmed", "批量", "合肥", ""),
+    ("SHPD-2026-279-DS", "东方外贸", "40HC", 90, "2026-08-19", "2026-08-21", "confirmed", "小批量", "宝山", ""),
+    ("SHPD-2026-280-DS", "华东储能", "20储能箱", 56, "2026-08-20", "2026-08-21", "confirmed", "批量", "宝山", ""),
+    ("SHPD-2026-281-DS", "中远海运", "40HC", 120, "2026-08-03", "2026-08-12", "confirmed", "批量", "宝山", ""),
+    ("SHPD-2026-282-DS", "马士基", "Ener C+", 80, "2026-08-10", "2026-08-17", "draft", "批量", "宝山", "AI建议提前2天避开物料缺口"),
+    ("SHPD-2026-283-DS", "MSC", "20GP", 200, "2026-08-17", "2026-08-24", "pending_approval", "批量", "宁波", ""),
+    ("SHPD-2026-284-DS", "达飞轮船", "40HC", 150, "2026-08-20", "2026-08-28", "draft", "批量", "宝山", ""),
 ]
 SEP_ORDERS = [
-    ("DFQD-2026-285-DS", "中远海运", "40HCDD", 75, "2026-09-03", "2026-09-09", "confirmed", "批量", "上海", ""),
-    ("DFQD-2026-286-DS", "MSC", "40HC", 90, "2026-09-01", "2026-09-04", "confirmed", "批量", "宁波", ""),
-    ("DFQD-2026-287-DS", "Seaco", "20GP", 200, "2026-09-07", "2026-09-11", "confirmed", "批量", "宁波", ""),
-    ("DFQD-2026-288-DS", "马士基", "Ener C+", 40, "2026-09-10", "2026-09-11", "confirmed", "小批量", "上海", ""),
-    ("DFQD-2026-289-DS", "东方国际", "40HC", 120, "2026-09-14", "2026-09-18", "confirmed", "批量", "上海", ""),
-    ("DFQD-2026-290-DS", "宁德时代", "20储能箱", 100, "2026-09-21", "2026-09-24", "confirmed", "批量", "宁德", ""),
-    ("DFQD-2026-291-DS", "Triton", "40GP", 80, "2026-09-22", "2026-09-24", "confirmed", "批量", "青岛", ""),
-    ("DFQD-2026-292-DS", "中建集成", "房屋箱", 30, "2026-09-28", "2026-09-30", "draft", "批量", "启东", ""),
-    ("DFQD-2026-293-DS", "阳光电源", "光伏平板", 40, "2026-09-14", "2026-09-17", "pending_approval", "批量", "合肥", ""),
+    ("SHPD-2026-285-DS", "中远海运", "40HCDD", 75, "2026-09-03", "2026-09-09", "confirmed", "批量", "宝山", ""),
+    ("SHPD-2026-286-DS", "MSC", "40HC", 90, "2026-09-01", "2026-09-04", "confirmed", "批量", "宁波", ""),
+    ("SHPD-2026-287-DS", "Seaco", "20GP", 200, "2026-09-07", "2026-09-11", "confirmed", "批量", "宁波", ""),
+    ("SHPD-2026-288-DS", "马士基", "Ener C+", 40, "2026-09-10", "2026-09-11", "confirmed", "小批量", "宝山", ""),
+    ("SHPD-2026-289-DS", "东方国际", "40HC", 120, "2026-09-14", "2026-09-18", "confirmed", "批量", "宝山", ""),
+    ("SHPD-2026-290-DS", "宁德时代", "20储能箱", 100, "2026-09-21", "2026-09-24", "confirmed", "批量", "宁德", ""),
+    ("SHPD-2026-291-DS", "Triton", "40GP", 80, "2026-09-22", "2026-09-24", "confirmed", "批量", "青岛", ""),
+    ("SHPD-2026-292-DS", "中建集成", "房屋箱", 30, "2026-09-28", "2026-09-30", "draft", "批量", "浦东", ""),
+    ("SHPD-2026-293-DS", "阳光电源", "光伏平板", 40, "2026-09-14", "2026-09-17", "pending_approval", "批量", "合肥", ""),
 ]
 OCT_ORDERS = [
-    ("DFQD-2026-301-DS", "中远海运", "20GP", 300, "2026-10-08", "2026-10-14", "confirmed", "批量", "上海", ""),
-    ("DFQD-2026-302-DS", "达飞轮船", "40HC", 100, "2026-10-15", "2026-10-21", "confirmed", "批量", "上海", ""),
-    ("DFQD-2026-303-DS", "Enercore", "Ener E", 50, "2026-10-22", "2026-10-27", "draft", "批量", "上海", ""),
+    ("SHPD-2026-301-DS", "中远海运", "20GP", 300, "2026-10-08", "2026-10-14", "confirmed", "批量", "宝山", ""),
+    ("SHPD-2026-302-DS", "达飞轮船", "40HC", 100, "2026-10-15", "2026-10-21", "confirmed", "批量", "宝山", ""),
+    ("SHPD-2026-303-DS", "Enercore", "Ener E", 50, "2026-10-22", "2026-10-27", "draft", "批量", "宝山", ""),
 ]
 OTHER_LINE_ORDERS = [
-    ("SH-A", "DFSH-2026-118-DS", "中远海运", "40HC", 260, "2026-08-05", "2026-08-11", "confirmed"),
-    ("SH-A", "DFSH-2026-119-DS", "长荣海运", "20GP", 300, "2026-08-12", "2026-08-15", "confirmed"),
-    ("NT-A", "DFNT-2026-207-DS", "赫伯罗特", "40HC", 240, "2026-08-06", "2026-08-12", "confirmed"),
-    ("NT-B", "DFNT-2026-156-DS", "阳明海运", "20GP", 280, "2026-08-10", "2026-08-13", "confirmed"),
-    ("LYG-A", "DFLYG-2026-089-DS", "现代商船", "40GP", 200, "2026-08-11", "2026-08-16", "confirmed"),
+    ("BS-A", "SHBS-2026-118-DS", "中远海运", "40HC", 260, "2026-08-05", "2026-08-11", "confirmed"),
+    ("BS-A", "SHBS-2026-119-DS", "长荣海运", "20GP", 300, "2026-08-12", "2026-08-15", "confirmed"),
+    ("JS-A", "SHJS-2026-207-DS", "赫伯罗特", "40HC", 240, "2026-08-06", "2026-08-12", "confirmed"),
+    ("JS-B", "SHJS-2026-156-DS", "阳明海运", "20GP", 280, "2026-08-10", "2026-08-13", "confirmed"),
+    ("FX-A", "SHFX-2026-089-DS", "现代商船", "40GP", 200, "2026-08-11", "2026-08-16", "confirmed"),
 ]
 
 DEVICES = [
-    ("WLD-R03", "焊接机器人#3", "QD-D", 92, "正常", 1200, ""),
-    ("COAT-L01", "涂装线", "QD-D", 78, "预警", 560, "建议下周点检"),
-    ("AIR-T02", "气密检测设备", "QD-D", 88, "正常", 890, ""),
-    ("BEND-M04", "折弯机", "QD-D", 65, "警告", 320, "伺服系统需关注"),
-    ("CUT-P01", "等离子切割机", "QD-D", 95, "正常", 1500, ""),
+    ("WLD-R03", "焊接机器人#3", "PD-D", 92, "正常", 1200, ""),
+    ("COAT-L01", "涂装线", "PD-D", 78, "预警", 560, "建议下周点检"),
+    ("AIR-T02", "气密检测设备", "PD-D", 88, "正常", 890, ""),
+    ("BEND-M04", "折弯机", "PD-D", 65, "警告", 320, "伺服系统需关注"),
+    ("CUT-P01", "等离子切割机", "PD-D", 95, "正常", 1500, ""),
 ]
 ALERTS = [
     ("08:42", "设备Agent", "严重", "焊接机器人#3轴2温度异常，已触发诊断流程", "处理中"),
     ("08:15", "工艺Agent", "警告", "涂装线排风压差偏低，可能影响漆面固化", "待确认"),
-    ("07:50", "排产Agent", "提示", "QD-D 8月14日班次计划已下发至MES", "已关闭"),
+    ("07:50", "排产Agent", "提示", "PD-D 8月14日班次计划已下发至MES", "已关闭"),
     ("07:20", "设备Agent", "严重", "折弯机伺服报警，维修工单已生成（WO-2026-0814-02）", "处理中"),
     ("06:55", "质量Agent", "警告", "气密检测工位节拍超时，建议排查密封垫老化", "待确认"),
 ]
 # (code, name, category, factory, stock_note, in_stock_units, order_deducted_units,
 #  support_units, in_transit_units, purchase_units, arrival_date, status)
 MATERIALS = [
-    # 青岛 DFQD
-    ("STEEL", "耐候钢SPA-H", "钢板", "DFQD", "当前库存2600吨", 2600, 1800, 800, 600, 1200, date(2026, 9, 5), "充足"),
-    ("PAINT", "环氧防腐涂料", "油漆", "DFQD", "底漆+面漆库存", 6500, 4500, 2000, 0, 1500, None, "充足"),
-    ("CORNER", "角件/锁具", "角件", "DFQD", "库存约600箱当量", 1500, 900, 600, 400, 800, date(2026, 8, 30), "需补货"),
-    ("FLOOR", "木地板", "地板", "DFQD", "进口硬木库存", 5200, 3700, 1500, 0, 600, None, "充足"),
-    ("LOCK", "锁杆/铰链", "五金", "DFQD", "常规安全库存", 4200, 3000, 1200, 0, 400, None, "充足"),
-    # 上海 DFSH
-    ("STEEL-SH", "耐候钢SPA-H", "钢板", "DFSH", "在库1900吨", 1900, 1400, 620, 450, 900, date(2026, 9, 8), "充足"),
-    ("PAINT-SH", "环氧防腐涂料", "油漆", "DFSH", "底漆+面漆库存", 4800, 3300, 1600, 0, 1200, None, "充足"),
-    ("CORNER-SH", "角件/锁具", "角件", "DFSH", "库存约450箱当量", 1100, 700, 480, 300, 600, date(2026, 9, 1), "需补货"),
-    ("FLOOR-SH", "木地板", "地板", "DFSH", "进口硬木库存", 3900, 2800, 1100, 0, 500, None, "充足"),
-    ("LOCK-SH", "锁杆/铰链", "五金", "DFSH", "常规安全库存", 3100, 2200, 900, 0, 300, None, "充足"),
-    # 南通 DFNT
-    ("STEEL-NT", "耐候钢SPA-H", "钢板", "DFNT", "在库2100吨", 2100, 1600, 700, 500, 1000, date(2026, 9, 6), "充足"),
-    ("PAINT-NT", "环氧防腐涂料", "油漆", "DFNT", "底漆+面漆库存", 5400, 3800, 1800, 0, 1100, None, "充足"),
-    ("CORNER-NT", "角件/锁具", "角件", "DFNT", "库存约520箱当量", 1300, 850, 560, 350, 700, date(2026, 8, 31), "需补货"),
-    ("FLOOR-NT", "木地板", "地板", "DFNT", "进口硬木库存", 4600, 3400, 1300, 0, 550, None, "充足"),
-    ("LOCK-NT", "锁杆/铰链", "五金", "DFNT", "常规安全库存", 3600, 2600, 950, 0, 350, None, "充足"),
-    # 连云港 DFLYG
-    ("STEEL-LYG", "耐候钢SPA-H", "钢板", "DFLYG", "在库1700吨", 1700, 1200, 560, 400, 800, date(2026, 9, 9), "充足"),
-    ("PAINT-LYG", "环氧防腐涂料", "油漆", "DFLYG", "底漆+面漆库存", 4300, 3000, 1400, 0, 1000, None, "充足"),
-    ("CORNER-LYG", "角件/锁具", "角件", "DFLYG", "库存约400箱当量", 1000, 650, 430, 280, 550, date(2026, 9, 2), "需补货"),
-    ("FLOOR-LYG", "木地板", "地板", "DFLYG", "进口硬木库存", 3500, 2500, 1000, 0, 450, None, "充足"),
-    ("LOCK-LYG", "锁杆/铰链", "五金", "DFLYG", "常规安全库存", 2800, 2000, 800, 0, 300, None, "充足"),
+    # 青岛 SHPD
+    ("STEEL", "耐候钢SPA-H", "钢板", "SHPD", "当前库存2600吨", 2600, 1800, 800, 600, 1200, date(2026, 9, 5), "充足"),
+    ("PAINT", "环氧防腐涂料", "油漆", "SHPD", "底漆+面漆库存", 6500, 4500, 2000, 0, 1500, None, "充足"),
+    ("CORNER", "角件/锁具", "角件", "SHPD", "库存约600箱当量", 1500, 900, 600, 400, 800, date(2026, 8, 30), "需补货"),
+    ("FLOOR", "木地板", "地板", "SHPD", "进口硬木库存", 5200, 3700, 1500, 0, 600, None, "充足"),
+    ("LOCK", "锁杆/铰链", "五金", "SHPD", "常规安全库存", 4200, 3000, 1200, 0, 400, None, "充足"),
+    # 宝山 SHBS
+    ("STEEL-SH", "耐候钢SPA-H", "钢板", "SHBS", "在库1900吨", 1900, 1400, 620, 450, 900, date(2026, 9, 8), "充足"),
+    ("PAINT-SH", "环氧防腐涂料", "油漆", "SHBS", "底漆+面漆库存", 4800, 3300, 1600, 0, 1200, None, "充足"),
+    ("CORNER-SH", "角件/锁具", "角件", "SHBS", "库存约450箱当量", 1100, 700, 480, 300, 600, date(2026, 9, 1), "需补货"),
+    ("FLOOR-SH", "木地板", "地板", "SHBS", "进口硬木库存", 3900, 2800, 1100, 0, 500, None, "充足"),
+    ("LOCK-SH", "锁杆/铰链", "五金", "SHBS", "常规安全库存", 3100, 2200, 900, 0, 300, None, "充足"),
+    # 金山 SHJS
+    ("STEEL-NT", "耐候钢SPA-H", "钢板", "SHJS", "在库2100吨", 2100, 1600, 700, 500, 1000, date(2026, 9, 6), "充足"),
+    ("PAINT-NT", "环氧防腐涂料", "油漆", "SHJS", "底漆+面漆库存", 5400, 3800, 1800, 0, 1100, None, "充足"),
+    ("CORNER-NT", "角件/锁具", "角件", "SHJS", "库存约520箱当量", 1300, 850, 560, 350, 700, date(2026, 8, 31), "需补货"),
+    ("FLOOR-NT", "木地板", "地板", "SHJS", "进口硬木库存", 4600, 3400, 1300, 0, 550, None, "充足"),
+    ("LOCK-NT", "锁杆/铰链", "五金", "SHJS", "常规安全库存", 3600, 2600, 950, 0, 350, None, "充足"),
+    # 奉贤 SHFX
+    ("STEEL-LYG", "耐候钢SPA-H", "钢板", "SHFX", "在库1700吨", 1700, 1200, 560, 400, 800, date(2026, 9, 9), "充足"),
+    ("PAINT-LYG", "环氧防腐涂料", "油漆", "SHFX", "底漆+面漆库存", 4300, 3000, 1400, 0, 1000, None, "充足"),
+    ("CORNER-LYG", "角件/锁具", "角件", "SHFX", "库存约400箱当量", 1000, 650, 430, 280, 550, date(2026, 9, 2), "需补货"),
+    ("FLOOR-LYG", "木地板", "地板", "SHFX", "进口硬木库存", 3500, 2500, 1000, 0, 450, None, "充足"),
+    ("LOCK-LYG", "锁杆/铰链", "五金", "SHFX", "常规安全库存", 2800, 2000, 800, 0, 300, None, "充足"),
 ]
 
 
@@ -172,7 +172,7 @@ def _spread(quantity: int, n: int) -> list[int]:
 
 def _mk_plan(db: Session, seq: int, line: str, wo: str, customer: str, box_code: str,
              qty: int, start: str, end: str, status: str, order_type: str = "批量",
-             location: str = "上海", remark: str = "", source: str = "manual",
+             location: str = "宝山", remark: str = "", source: str = "manual",
              creator: str = "李计划") -> None:
     box = db.query(BoxType).filter(BoxType.code == box_code).first()
     teu = int(qty * float(box.teu_factor))
@@ -186,7 +186,7 @@ def _mk_plan(db: Session, seq: int, line: str, wo: str, customer: str, box_code:
     month_key = f"{s.year:04d}-{s.month:02d}"
     plan = SchedulePlan(
         plan_id=f"PLAN-{line}-{seq:04d}", plan_month=month_key,
-        factory_code={"QD-D": "DFQD", "SH-A": "DFSH", "NT-A": "DFNT", "NT-B": "DFNT", "LYG-A": "DFLYG"}[line],
+        factory_code={"PD-D": "SHPD", "BS-A": "SHBS", "JS-A": "SHJS", "JS-B": "SHJS", "FX-A": "SHFX"}[line],
         line_code=line, work_order_no=wo, customer=customer, box_type=box_code,
         quantity=qty, teu=teu, cteu=cteu, production_deadline="按时",
         delivery_status="按时", order_source="自接单", trade_type="外贸",
@@ -205,16 +205,16 @@ def _mk_plan(db: Session, seq: int, line: str, wo: str, customer: str, box_code:
 
 
 APPROVALS = [
-    dict(approval_no="AP-2026-0814-003", approval_type="排产变更", title="QD-D排产变更：插入样箱订单（Ener C+ 2台）",
+    dict(approval_no="AP-2026-0814-003", approval_type="排产变更", title="PD-D排产变更：插入样箱订单（Ener C+ 2台）",
          priority="高优先级", applicant="李明", applicant_role="计划员",
-         submitted_at=datetime(2026, 8, 14, 10, 23), affect_lines="QD-D 特箱线",
+         submitted_at=datetime(2026, 8, 14, 10, 23), affect_lines="PD-D 特箱线",
          expect_effect_time="2026-08-14 12:00", risk_level="中风险", related_agent="Scheduler-Agent v2.4",
          need_countersign=True, status="pending",
          detail={
-             "reason": "客户东方国际于8月13日提交加急样箱订单（PO-2026-0813-91），要求8月18日前交付首件。当前QD-D白班计划已满，AI建议插入样箱订单并后移部分低优先级常规订单。",
+             "reason": "客户东方国际于8月13日提交加急样箱订单（PO-2026-0813-91），要求8月18日前交付首件。当前PD-D白班计划已满，AI建议插入样箱订单并后移部分低优先级常规订单。",
              "plan_compare": {
-                 "original": "8/14 白班常规订单 DFQD-2026-278-DS；样箱订单未排入；首件交付 8月21日",
-                 "new": "8/14 白班插入样箱订单首件；DFQD-2026-278-DS 部分后移至 8/16~8/17；首件交付 8月17日",
+                 "original": "8/14 白班常规订单 SHPD-2026-278-DS；样箱订单未排入；首件交付 8月21日",
+                 "new": "8/14 白班插入样箱订单首件；SHPD-2026-278-DS 部分后移至 8/16~8/17；首件交付 8月17日",
              },
              "impacts": [
                  {"type": "产能影响", "content": "白班利用率从 94% 降至 87%，损失约 14 标准箱当量"},
@@ -230,7 +230,7 @@ APPROVALS = [
          }),
     dict(approval_no="AP-2026-0814-002", approval_type="紧急维修", title="焊接机器人M-204送丝机构停机紧急维修",
          priority="紧急", applicant="王强", applicant_role="设备主管",
-         submitted_at=datetime(2026, 8, 14, 9, 45), affect_lines="QD-D 焊接工段",
+         submitted_at=datetime(2026, 8, 14, 9, 45), affect_lines="PD-D 焊接工段",
          expect_effect_time="立即", risk_level="高风险", related_agent="Device-Agent v1.8",
          need_countersign=True, status="pending",
          detail={
@@ -240,7 +240,7 @@ APPROVALS = [
              "impacts": [
                  {"type": "产能影响", "content": "占用4小时检修窗口，当日排产减少约12台当量，可通过周末加班追回"},
                  {"type": "物料影响", "content": "送丝管备件库存2套，满足本次更换"},
-                 {"type": "交期影响", "content": "DFQD-2026-283-DS 交期不受影响"},
+                 {"type": "交期影响", "content": "SHPD-2026-283-DS 交期不受影响"},
              ],
              "attachments": ["设备诊断报告.pdf"],
              "timeline": [
@@ -270,18 +270,18 @@ APPROVALS = [
                  {"node": "待采购经理审批", "time": "当前节点"},
              ],
          }),
-    dict(approval_no="AP-2026-0813-005", approval_type="排产变更", title="NT-B班次调整：夜班产能提升",
+    dict(approval_no="AP-2026-0813-005", approval_type="排产变更", title="JS-B班次调整：夜班产能提升",
          priority="普通", applicant="赵敏", applicant_role="计划员",
-         submitted_at=datetime(2026, 8, 13, 11, 8), affect_lines="NT-B 南通B线",
+         submitted_at=datetime(2026, 8, 13, 11, 8), affect_lines="JS-B 金山B线",
          expect_effect_time="2026-08-18", risk_level="低风险", related_agent="Scheduler-Agent v2.4",
          need_countersign=False, status="pending",
          detail={
-             "reason": "NT-B线8月下旬订单集中，白班产能不足，建议18日起增开夜班，日产能从240TEU提升至300TEU。",
+             "reason": "JS-B线8月下旬订单集中，白班产能不足，建议18日起增开夜班，日产能从240TEU提升至300TEU。",
              "plan_compare": {"original": "仅白班，8月底前需外协50TEU", "new": "白班+夜班，无需外协"},
              "impacts": [
                  {"type": "产能影响", "content": "日产能+60TEU，8月排产余量增加"},
                  {"type": "成本影响", "content": "夜班津贴增加约¥3.2万/月，低于外协成本"},
-                 {"type": "交期影响", "content": "DFNT-2026-156-DS 交付提前2天"},
+                 {"type": "交期影响", "content": "SHJS-2026-156-DS 交付提前2天"},
              ],
              "attachments": [],
              "timeline": [
@@ -308,9 +308,9 @@ APPROVALS = [
                  {"node": "待财务经理+生产部长双签", "time": "当前节点"},
              ],
          }),
-    dict(approval_no="AP-2026-0814-006", approval_type="排产变更", title="DFQD-2026-285-DS 提前2天投产",
+    dict(approval_no="AP-2026-0814-006", approval_type="排产变更", title="SHPD-2026-285-DS 提前2天投产",
          priority="高优先级", applicant="李计划", applicant_role="计划员",
-         submitted_at=datetime(2026, 8, 14, 9, 30), affect_lines="QD-D 特箱线",
+         submitted_at=datetime(2026, 8, 14, 9, 30), affect_lines="PD-D 特箱线",
          expect_effect_time="2026-09-01", risk_level="中风险", related_agent="Scheduler-Agent v2.4",
          need_countersign=False, status="pending",
          detail={
@@ -329,7 +329,7 @@ APPROVALS = [
          }),
     dict(approval_no="AP-2026-0814-007", approval_type="紧急维修", title="焊接机器人送丝异常维修工单",
          priority="高优先级", applicant="王设备", applicant_role="设备主管",
-         submitted_at=datetime(2026, 8, 14, 10, 15), affect_lines="QD-D 焊接工段",
+         submitted_at=datetime(2026, 8, 14, 10, 15), affect_lines="PD-D 焊接工段",
          expect_effect_time="立即", risk_level="高风险", related_agent="Device-Agent v1.8",
          need_countersign=False, status="pending",
          detail={
@@ -342,7 +342,7 @@ APPROVALS = [
          }),
     dict(approval_no="AP-2026-0814-008", approval_type="样箱插单", title="样箱插单 - Ener C+ 2台",
          priority="普通", applicant="张业务", applicant_role="业务经理",
-         submitted_at=datetime(2026, 8, 14, 11, 0), affect_lines="QD-D 特箱线",
+         submitted_at=datetime(2026, 8, 14, 11, 0), affect_lines="PD-D 特箱线",
          expect_effect_time="2026-08-18", risk_level="低风险", related_agent="Scheduler-Agent v2.4",
          need_countersign=False, status="pending",
          detail={
@@ -357,14 +357,14 @@ APPROVALS = [
 APPROVED_APPROVALS = [
     dict(approval_no="AP-2026-0811-002", approval_type="采购申请", title="木地板补充采购（300箱当量）",
          priority="普通", applicant="陈晨", applicant_role="采购专员",
-         submitted_at=datetime(2026, 8, 11, 10, 0), affect_lines="QD-D",
+         submitted_at=datetime(2026, 8, 11, 10, 0), affect_lines="PD-D",
          expect_effect_time="2026-08-25", risk_level="低风险", related_agent="SupplyChain-Agent v1.5",
          need_countersign=False, status="approved",
          detail={"reason": "木地板安全库存补足", "plan_compare": {"original": "-", "new": "补充采购300箱当量"},
                  "impacts": [], "attachments": [], "timeline": [{"node": "已通过", "time": "2026-08-11 15:00"}]}),
     dict(approval_no="AP-2026-0810-001", approval_type="排产变更", title="8月上旬排产计划（v3）生效",
          priority="高优先级", applicant="李明", applicant_role="计划员",
-         submitted_at=datetime(2026, 8, 10, 9, 0), affect_lines="QD-D",
+         submitted_at=datetime(2026, 8, 10, 9, 0), affect_lines="PD-D",
          expect_effect_time="2026-08-10", risk_level="中风险", related_agent="Scheduler-Agent v2.4",
          need_countersign=True, status="approved",
          detail={"reason": "月度排产计划审批", "plan_compare": {"original": "v2", "new": "v3 微调2个工令"},
@@ -417,13 +417,13 @@ def seed(db: Session) -> None:
 
     seq = 1
     for wo, cust, box, qty, s, e, st, ot, loc, remark in AUG_ORDERS:
-        _mk_plan(db, seq, "QD-D", wo, cust, box, qty, s, e, st, ot, loc, remark)
+        _mk_plan(db, seq, "PD-D", wo, cust, box, qty, s, e, st, ot, loc, remark)
         seq += 1
     for wo, cust, box, qty, s, e, st, ot, loc, remark in SEP_ORDERS:
-        _mk_plan(db, seq, "QD-D", wo, cust, box, qty, s, e, st, ot, loc, remark)
+        _mk_plan(db, seq, "PD-D", wo, cust, box, qty, s, e, st, ot, loc, remark)
         seq += 1
     for wo, cust, box, qty, s, e, st, ot, loc, remark in OCT_ORDERS:
-        _mk_plan(db, seq, "QD-D", wo, cust, box, qty, s, e, st, ot, loc, remark)
+        _mk_plan(db, seq, "PD-D", wo, cust, box, qty, s, e, st, ot, loc, remark)
         seq += 1
     for line, wo, cust, box, qty, s, e, st in OTHER_LINE_ORDERS:
         _mk_plan(db, seq, line, wo, cust, box, qty, s, e, st)
@@ -431,13 +431,13 @@ def seed(db: Session) -> None:
 
     # 月度计划产能目标（TEU）
     aug_scheduled = (db.query(ScheduleDaily)
-                     .filter(ScheduleDaily.line_code == "QD-D",
+                     .filter(ScheduleDaily.line_code == "PD-D",
                              ScheduleDaily.schedule_date >= date(2026, 8, 1),
                              ScheduleDaily.schedule_date <= date(2026, 8, 31)))
     aug_teu = sum(r.teu or 0 for r in aug_scheduled)
     for month, teu in [("2026-08", max(aug_teu + 616, 3000)), ("2026-09", 3600), ("2026-10", 3400)]:
-        db.add(MonthlyPlanTarget(line_code="QD-D", plan_month=month, plan_teu=teu))
-    for line in ["SH-A", "NT-A", "NT-B", "LYG-A"]:
+        db.add(MonthlyPlanTarget(line_code="PD-D", plan_month=month, plan_teu=teu))
+    for line in ["BS-A", "JS-A", "JS-B", "FX-A"]:
         db.add(MonthlyPlanTarget(line_code=line, plan_month="2026-08", plan_teu=4200))
 
     for d in DEVICES:
@@ -465,19 +465,19 @@ def seed(db: Session) -> None:
     db.add(IntentionOrder(
         intention_id="IO-2026-0813-001", source="mobile",
         input_text="客户要200台20GP，10月底要，能排上吗", box_type="20GP", quantity=200,
-        delivery_date=date(2026, 10, 31), delivery_location="上海", customer="东方国际",
+        delivery_date=date(2026, 10, 31), delivery_location="宝山", customer="东方国际",
         teu=200, schedule_analysis={}, status="confirmed", created_by="张业务",
         confirmed_at=datetime(2026, 8, 13, 15, 40)))
     db.add(IntentionOrder(
         intention_id="IO-2026-0814-001", source="mobile",
-        input_text="意向新订单，Ener C+ 50台，急单，9月15日前交付上海", box_type="Ener C+",
-        quantity=50, delivery_date=date(2026, 9, 15), delivery_location="上海", customer="Enercore",
+        input_text="意向新订单，Ener C+ 50台，急单，9月15日前交付宝山", box_type="Ener C+",
+        quantity=50, delivery_date=date(2026, 9, 15), delivery_location="宝山", customer="Enercore",
         teu=100, schedule_analysis={}, status="pending", created_by="张业务"))
 
     notis = [
         ("张业务", "意向订单已确认", "IO-2026-0813-001 已由计划员确认排产（10/19~10/20 生产）", "排产"),
         ("张业务", "交期预警", "Ener C+ 50台急单：当前9月中旬产能紧张，建议提前确认", "预警"),
-        ("张业务", "排产变更通知", "DFQD-2026-283-DS 排产已获审批生效（8/17~8/24）", "排产"),
+        ("张业务", "排产变更通知", "SHPD-2026-283-DS 排产已获审批生效（8/17~8/24）", "排产"),
         ("李计划", "新意向订单待处理", "张业务提交 Ener C+ 50台意向订单，请及时排产", "订单"),
     ]
     for u, t, c, ty in notis:

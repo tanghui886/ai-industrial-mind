@@ -17,6 +17,7 @@ const router = createRouter({
         { path: 'agent', name: 'pc-agent', component: () => import('@/views/pc/AgentChatView.vue'), meta: { title: 'Agent 对话台' } },
         { path: 'approval', name: 'pc-approval', component: () => import('@/views/pc/ApprovalView.vue'), meta: { title: '审批工作台' } },
         { path: 'material', name: 'pc-material', component: () => import('@/views/pc/MaterialManageView.vue'), meta: { title: '物料维护', menu: 'material' } },
+        { path: 'supplier', name: 'pc-supplier', component: () => import('@/views/pc/SupplierDynamicsView.vue'), meta: { title: '供货商动态', menu: 'material' } },
         { path: 'storage', name: 'pc-storage', component: () => import('@/views/pc/StorageView.vue'), meta: { title: '堆存管理', menu: 'storage' } },
         { path: 'device', name: 'pc-device', component: () => import('@/views/pc/DeviceScreenView.vue'), meta: { title: '设备异常大屏', menu: 'device' } },
         { path: 'device-manage', name: 'pc-device-manage', component: () => import('@/views/pc/DeviceManageView.vue'), meta: { title: '设备管理', menu: 'device' } },
@@ -30,6 +31,7 @@ const router = createRouter({
         { path: 'permissions', name: 'pc-permissions', component: () => import('@/views/pc/PermManageView.vue'), meta: { title: '权限管理', admin: true } },
         { path: 'roles', name: 'pc-roles', component: () => import('@/views/pc/RoleManageView.vue'), meta: { title: '角色管理', admin: true } },
         { path: 'llm-log', name: 'pc-llm-log', component: () => import('@/views/pc/ModelCallLogView.vue'), meta: { title: '模型调用记录', admin: true } },
+        { path: 'menu-manage', name: 'pc-menu-manage', component: () => import('@/views/pc/MenuManageView.vue'), meta: { title: '菜单管理', admin: true } },
       ],
     },
     // 移动端

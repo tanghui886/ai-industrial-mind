@@ -11,6 +11,8 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from ..agents import ENABLE_DEEP_AGENTS, chat as agents_deep_chat
+from ..agents.base import AGENT_DISPLAY
 from ..database import get_db
 from ..models import ChatMessage, ChatSession, SchedulePlan
 from ..services import planning_engine as engine
@@ -73,7 +75,7 @@ def build_response(message: str, db: Session, llm_result: dict | None = None,
     for k, v in llm_info.items():
         if v not in (None, "", False):
             info[k] = v
-    line = info.get("line_code") or "QD-D"
+    line = info.get("line_code") or "PD-D"
     card, text = None, ""
 
     if intent == "new_order_intent" and info.get("box_type") and info.get("quantity"):
@@ -142,7 +144,7 @@ def build_response(message: str, db: Session, llm_result: dict | None = None,
                  "start_date": o.start_date.isoformat(), "end_date": o.end_date.isoformat(),
                  "status": o.status, "customer": o.customer} for o in orders[:8]]}
         else:
-            text = "未查询到匹配的工令，请提供工令号（如 DFQD-2026-281-DS）或箱型+月份。"
+            text = "未查询到匹配的工令，请提供工令号（如 SHPD-2026-281-DS）或箱型+月份。"
     elif intent == "device_query":
         devices = _gen_devices(db)
         abnormal = [d for d in devices if d["status"] != "正常"]
@@ -220,8 +222,8 @@ def build_response(message: str, db: Session, llm_result: dict | None = None,
     else:
         text = ("我是 ContainerMind 工业协同 Agent，可以帮您：\n"
                 "1. 排产可行性评估：例如「意向新订单，40HC箱型 1000台，9月30日交付上海」\n"
-                "2. 产能查询：例如「9月份QD-D线还有多少空位」\n"
-                "3. 排产查询：例如「DFQD-2026-281-DS排到几号了」\n"
+                "2. 产能查询：例如「9月份PD-D线还有多少空位」\n"
+                "3. 排产查询：例如「SHPD-2026-281-DS排到几号了」\n"
                 "4. 物料缺口：例如「当前各产线物料缺口情况如何」\n"
                 "5. 堆存风险：例如「哪些产线的堆存存在爆仓风险」\n"
                 "6. 成本动因：例如「本月成本动因分析」")
@@ -333,7 +335,38 @@ async def _llm_refine_reply(result: dict, message: str, user: str = "anonymous",
     return content or None
 
 
-def _ensure_session(db: Session, user: str, session_id: str, message: str) -> None:
+INTENT_LABEL = {"new_order_intent": "智能排产", "capacity_query": "智能排产",
+                "schedule_query": "智能排产", "device_query": "设备诊断",
+                "material_gap": "物料缺口", "storage_risk": "堆存风险",
+                "cost_analysis": "成本动因", "general_chat": "其他"}
+
+
+async def _deep_agent_result(message: str, user: str, session_id: str) -> dict | None:
+    """优选路径：调用 deepagents 主 Agent 编排各子 Agent。成功返回与 build_response 兼容的
+    结果（reply_text 为编排出文），失败/未启用返回 None 由规则引擎兜底。"""
+    if not ENABLE_DEEP_AGENTS:
+        return None
+    parsed = parse_intent(message)
+    text = await agents_deep_chat(message, session_id=session_id, user=user)
+    if not text:
+        return None
+    intent = parsed["intent"]
+    return {
+        "intent": intent,
+        "intent_label": INTENT_LABEL.get(intent, "其他"),
+        "confidence": parsed["confidence"],
+        "agent": AGENT_DISPLAY,
+        "extracted_info": parsed["extracted_info"],
+        "missing_fields": parsed["missing_fields"],
+        "reply_text": text,
+        "card": None,
+        "suggestions": ["按交期倒排", "规避检修日", "替代物料方案", "分批交付方案"],
+        "safety_note": SAFETY_NOTE,
+        "engine": "deepagents · 多智能体编排",
+    }
+
+
+async def _ensure_session(db: Session, user: str, session_id: str, message: str) -> None:
     """确保会话存在；新会话自动创建并以其首条消息生成标题"""
     if session_id in ("default", "", "new"):
         return
@@ -370,17 +403,19 @@ async def chat(body: ChatReq, db: Session = Depends(get_db),
                x_username: str | None = Header(default=None, alias="X-Username")):
     user = (x_username or body.user or "anonymous").strip() or "anonymous"
     _ensure_session(db, user, body.session_id, body.message)
-    # 优先尝试 LLM 意图识别（未配置 Key 时自动回落规则引擎）
-    llm_result = await llm_parse_intent(body.message, user=user, session_id=body.session_id)
-    result = build_response(body.message, db, llm_result)
-    refined = await _llm_refine_reply(result, body.message, user=user, session_id=body.session_id)
-    if refined:
-        result["reply_text"] = refined
-    if llm_result and llm_result.get("intent"):
-        result["llm_intent"] = llm_result
-        result["engine"] = "deepseek-v4-flash-0731 + 规则引擎"
-    else:
-        result["engine"] = "内置规则引擎（未配置 LLM API Key，可在 .env 中配置）"
+    # 优选 deepagents 多智能体编排；失败/未启用时回落 LLM 意图识别 + 规则引擎
+    result = await _deep_agent_result(body.message, user=user, session_id=body.session_id)
+    if result is None:
+        llm_result = await llm_parse_intent(body.message, user=user, session_id=body.session_id)
+        result = build_response(body.message, db, llm_result)
+        refined = await _llm_refine_reply(result, body.message, user=user, session_id=body.session_id)
+        if refined:
+            result["reply_text"] = refined
+        if llm_result and llm_result.get("intent"):
+            result["llm_intent"] = llm_result
+            result["engine"] = "deepseek-v4-flash-0731 + 规则引擎"
+        else:
+            result["engine"] = "内置规则引擎（未配置 LLM API Key，可在 .env 中配置）"
     _save_messages(db, user, body.session_id, body.message, result)
     return result
 
@@ -409,11 +444,13 @@ async def chat_stream_get(payload: str, db: Session = Depends(get_db),
 
 
 async def _sse_response(message: str, db, user: str = "anonymous", session_id: str = "default"):
-    llm_result = await llm_parse_intent(message, user=user, session_id=session_id)
-    result = build_response(message, db, llm_result)
-    refined = await _llm_refine_reply(result, message, user=user, session_id=session_id)
-    if refined:
-        result["reply_text"] = refined
+    result = await _deep_agent_result(message, user=user, session_id=session_id)
+    if result is None:
+        llm_result = await llm_parse_intent(message, user=user, session_id=session_id)
+        result = build_response(message, db, llm_result)
+        refined = await _llm_refine_reply(result, message, user=user, session_id=session_id)
+        if refined:
+            result["reply_text"] = refined
     _save_messages(db, user, session_id, message, result)
 
     async def gen():

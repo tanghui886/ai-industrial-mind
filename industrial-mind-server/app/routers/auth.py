@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import User
-from ..permissions import role_menus, role_perms
+from ..permissions import role_menu_tree, role_menus, role_perms
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -29,6 +29,7 @@ def _token(user: User, db: Session) -> dict:
                  "role": user.role, "phone": user.phone},
         "perms": sorted(role_perms(user.role, db)),
         "menus": sorted(role_menus(user.role, db)),
+        "menu_tree": role_menu_tree(user.role, db),
     }
 
 
@@ -62,7 +63,8 @@ def me(x_username: str | None = Header(default=None, alias="X-Username"),
     return {"username": user.username, "display_name": user.display_name,
             "role": user.role, "phone": user.phone,
             "perms": sorted(role_perms(user.role, db)),
-            "menus": sorted(role_menus(user.role, db))}
+            "menus": sorted(role_menus(user.role, db)),
+            "menu_tree": role_menu_tree(user.role, db)}
 
 
 @router.post("/refresh")

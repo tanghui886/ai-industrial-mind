@@ -13,7 +13,7 @@ from ..models import (BoxType, Material, MonthlyPlanTarget, ScheduleDaily,
 from .calendar_util import (default_workday, month_calendar,
                             next_workdays, workdays_between)
 
-DEFAULT_LINE = "QD-D"
+DEFAULT_LINE = "PD-D"
 INSPECTION_DAYS = 2
 TRANSPORT_DAYS = {"上海": 2, "青岛": 2, "宁波": 2, "连云港": 2, "南通": 2, "启东": 2,
                   "天津": 3, "深圳": 3, "广州": 3, "厦门": 3, "大连": 3, " default": 3}

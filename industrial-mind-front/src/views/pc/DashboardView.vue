@@ -25,7 +25,7 @@ const statusColor: Record<string, string> = { '处理中': 'text-error', '待确
 async function load() {
   loading.value = true
   try {
-    data.value = await getDashboard('QD-D')
+    data.value = await getDashboard('PD-D')
     refreshedAt.value = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
     setTimeout(renderChart, 0)
   } finally {
